@@ -95,6 +95,50 @@ describe('Fluxo de login', () => {
 });
 ```
 
+## Testando a camada de back-end
+
+### Services e Repositories — testes unitários
+
+- Mocke `db` (Prisma) com `vi.mock('@/lib/db')`.
+- Coloque o teste junto ao arquivo: `lib/services/booking/BookingService.test.ts`.
+
+```ts
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { db } from '@/lib/db';
+import { BookingService } from '.';
+
+vi.mock('@/lib/db', () => ({ db: { booking: { create: vi.fn() } } }));
+
+describe('BookingService.create', () => {
+  it('cria uma reserva com os dados corretos', async () => {
+    vi.mocked(db.booking.create).mockResolvedValue({ id: '1' } as never);
+    const result = await BookingService.create({ guestId: 'g1', propertyId: 'p1' });
+    expect(result.id).toBe('1');
+  });
+});
+```
+
+### Server Actions — testes unitários
+
+- Mocke o Service chamado pela Action.
+- Coloque em `lib/actions/[domain]/actionName.test.ts`.
+
+```ts
+import { describe, it, expect, vi } from 'vitest';
+import { createBooking } from '.';
+import { BookingService } from '@/lib/services/booking';
+
+vi.mock('@/lib/services/booking');
+
+describe('createBooking action', () => {
+  it('retorna ok: false se input inválido', async () => {
+    const fd = new FormData();
+    const result = await createBooking(fd);
+    expect(result.ok).toBe(false);
+  });
+});
+```
+
 ## Comandos
 
 ```bash
