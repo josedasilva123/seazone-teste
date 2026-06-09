@@ -1,0 +1,104 @@
+---
+description: Exigência e convenções de testes unitários e de integração
+alwaysApply: true
+---
+
+# Testes — Obrigatórios em toda implementação
+
+Stack: **Vitest 4** + **React Testing Library** + **jsdom**.
+
+## Regra geral
+
+> **Todo componente novo e toda funcionalidade nova DEVEM ter testes.**  
+> Não entregue código sem o arquivo de teste correspondente.
+
+## Testes unitários
+
+- **Onde:** colocados junto ao componente, na mesma pasta.
+- **Nome:** `ComponentName.test.tsx` ou `utilName.test.ts`.
+- **O que cobrir:** renderização, props variantes, estados (loading, erro, vazio), callbacks/eventos.
+- **Mockar** dependências externas com `vi.mock`.
+
+```
+components/shared/atoms/Button/
+  index.tsx
+  Button.test.tsx   ✅ obrigatório
+
+components/booking/molecules/BookingCard/
+  index.tsx
+  BookingCard.test.tsx   ✅ obrigatório
+```
+
+### Estrutura mínima de um teste unitário de componente
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Button } from '.';
+
+describe('Button', () => {
+  it('renderiza o label corretamente', () => {
+    render(<Button>Confirmar</Button>);
+    expect(screen.getByRole('button', { name: 'Confirmar' })).toBeInTheDocument();
+  });
+
+  it('chama onClick ao ser clicado', async () => {
+    const onClick = vi.fn();
+    render(<Button onClick={onClick}>Confirmar</Button>);
+    await userEvent.click(screen.getByRole('button'));
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('fica desabilitado quando disabled=true', () => {
+    render(<Button disabled>Confirmar</Button>);
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+});
+```
+
+## Testes de integração
+
+- **Onde:** `tests/integration/[domain]/`.
+- **Nome:** `FlowName.test.tsx`.
+- **O que cobrir:** fluxos completos envolvendo múltiplos componentes (ex: preencher formulário → submeter → ver feedback).
+- Podem usar `vi.mock` para serviços externos (API, router), mas **não** para componentes internos.
+
+```
+tests/
+  setup.ts
+  integration/
+    booking/
+      BookingFlow.test.tsx   ✅ fluxo completo de reserva
+    auth/
+      LoginFlow.test.tsx     ✅ fluxo de autenticação
+```
+
+### Estrutura mínima de um teste de integração
+
+```tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LoginForm } from '@/components/auth/organisms/LoginForm';
+
+vi.mock('@/lib/auth', () => ({ login: vi.fn().mockResolvedValue({ token: 'abc' }) }));
+
+describe('Fluxo de login', () => {
+  it('exibe mensagem de sucesso após login válido', async () => {
+    render(<LoginForm />);
+    await userEvent.type(screen.getByLabelText('E-mail'), 'user@test.com');
+    await userEvent.type(screen.getByLabelText('Senha'), '123456');
+    await userEvent.click(screen.getByRole('button', { name: /entrar/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/bem-vindo/i)).toBeInTheDocument();
+    });
+  });
+});
+```
+
+## Comandos
+
+```bash
+npm test            # watch (desenvolvimento)
+npm run test:run    # execução única (CI)
+npm run coverage    # relatório de cobertura
+```
