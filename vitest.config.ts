@@ -10,12 +10,13 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: [
       'components/**/*.test.{ts,tsx}',
+      'lib/**/*.test.{ts,tsx}',
       'tests/integration/**/*.test.{ts,tsx}',
     ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['components/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
+      include: ['components/**/*.{ts,tsx}', 'lib/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
       exclude: [
         'node_modules/**',
         'tests/**',
