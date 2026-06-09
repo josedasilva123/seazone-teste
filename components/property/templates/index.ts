@@ -1,0 +1,1 @@
+export { PropertyGuideTemplate } from './PropertyGuideTemplate';
