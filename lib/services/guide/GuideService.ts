@@ -2,18 +2,20 @@ import { generateJsonContent } from '@/lib/ai';
 import { GuideRepository } from '@/lib/repositories/guide';
 import type { GuideWithPlaces } from '@/lib/repositories/guide';
 import { PropertyRepository } from '@/lib/repositories/property';
+import {
+  GUIDE_MIN_ATTRACTIONS,
+  GUIDE_MIN_RESTAURANTS,
+  getRawGuideValidationIssues,
+  isGuidePlacesComplete,
+  type RawGuide,
+} from '@/lib/validations/guide';
+
+const GUIDE_GENERATION_MAX_ATTEMPTS = 3;
 
 const GUIDE_SYSTEM_PROMPT = `Você é um especialista em turismo e gastronomia brasileiro. 
 Gere um guia local preciso e contextualizado para hóspedes de uma propriedade de temporada.
-Responda APENAS com JSON válido, sem markdown, sem texto adicional.`;
-
-interface RawGuide {
-  welcomeMessage?: string;
-  seasonalTips?: string;
-  restaurants?: Array<{ name: string; distance: string; description: string }>;
-  attractions?: Array<{ name: string; distance: string; description: string }>;
-  essentials?: Array<{ name: string; placeType: string; distance: string; description: string }>;
-}
+Responda APENAS com JSON válido, sem markdown, sem texto adicional.
+É OBRIGATÓRIO preencher todos os arrays com a quantidade mínima de itens solicitada — respostas incompletas serão rejeitadas.`;
 
 function buildGuidePrompt(
   propertyName: string,
@@ -36,29 +38,94 @@ Retorne um JSON com a seguinte estrutura exata:
   "welcomeMessage": "Mensagem de boas-vindas personalizada (2-3 frases)",
   "seasonalTips": "Dica sazonal relevante para ${month} nesta cidade (1-2 frases)",
   "restaurants": [
-    { "name": "Nome", "distance": "Aprox. X km", "description": "Descrição breve" }
+    { "name": "Nome do restaurante 1", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome do restaurante 2", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome do restaurante 3", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome do restaurante 4", "distance": "Aprox. X km", "description": "Descrição breve" }
   ],
   "attractions": [
-    { "name": "Nome", "distance": "Aprox. X km", "description": "Descrição breve" }
+    { "name": "Nome da atração 1", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome da atração 2", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome da atração 3", "distance": "Aprox. X km", "description": "Descrição breve" }
   ],
   "essentials": [
-    { "name": "Nome", "placeType": "pharmacy|supermarket|hospital", "distance": "Aprox. X km", "description": "Descrição breve" }
+    { "name": "Nome da farmácia", "placeType": "pharmacy", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome do supermercado", "placeType": "supermarket", "distance": "Aprox. X km", "description": "Descrição breve" },
+    { "name": "Nome do hospital", "placeType": "hospital", "distance": "Aprox. X km", "description": "Descrição breve" }
   ]
 }
 
-Regras:
-- 4 a 5 restaurantes REAIS e conhecidos em ${address.city}
-- 3 a 4 atrações REAIS em ${address.city}
-- Pelo menos 1 farmácia, 1 supermercado e 1 hospital
+Regras OBRIGATÓRIAS:
+- O array "restaurants" DEVE conter exatamente entre ${GUIDE_MIN_RESTAURANTS} e 5 restaurantes REAIS e conhecidos em ${address.city}
+- O array "attractions" DEVE conter exatamente entre ${GUIDE_MIN_ATTRACTIONS} e 4 atrações REAIS em ${address.city}
+- O array "essentials" DEVE incluir pelo menos 1 farmácia (placeType: "pharmacy"), 1 supermercado (placeType: "supermarket") e 1 hospital (placeType: "hospital")
+- Cada item deve ter name, distance e description preenchidos
 - Distâncias realistas baseadas no endereço informado
 - Todas as informações devem ser verídicas para ${address.city}, ${address.state}`;
+}
+
+function buildGuideRetryPrompt(basePrompt: string, issues: string[]): string {
+  return `${basePrompt}
+
+ATENÇÃO: A resposta anterior foi REJEITADA pelos seguintes motivos:
+${issues.map((issue) => `- ${issue}`).join('\n')}
+
+Gere novamente o JSON COMPLETO corrigindo TODOS os problemas acima.
+NÃO omita itens dos arrays — o mínimo é ${GUIDE_MIN_RESTAURANTS} restaurantes e ${GUIDE_MIN_ATTRACTIONS} atrações.`;
+}
+
+function mapRawGuideToPlaces(generated: RawGuide) {
+  return [
+    ...generated.restaurants.map((r) => ({
+      name: r.name,
+      category: 'restaurant' as const,
+      distance: r.distance,
+      description: r.description,
+    })),
+    ...generated.attractions.map((a) => ({
+      name: a.name,
+      category: 'attraction' as const,
+      distance: a.distance,
+      description: a.description,
+    })),
+    ...generated.essentials.map((e) => ({
+      name: e.name,
+      category: 'essential' as const,
+      placeType: e.placeType,
+      distance: e.distance,
+      description: e.description,
+    })),
+  ];
+}
+
+async function generateValidatedGuide(prompt: string): Promise<RawGuide> {
+  let lastIssues: string[] = ['Resposta inválida'];
+
+  for (let attempt = 0; attempt < GUIDE_GENERATION_MAX_ATTEMPTS; attempt++) {
+    const userPrompt = attempt === 0
+      ? prompt
+      : buildGuideRetryPrompt(prompt, lastIssues);
+    const temperature = attempt === 0 ? 0.7 : 0.4;
+
+    const raw = await generateJsonContent(GUIDE_SYSTEM_PROMPT, userPrompt, temperature);
+    const parsed: unknown = JSON.parse(raw);
+    const issues = getRawGuideValidationIssues(parsed);
+
+    if (issues.length === 0) {
+      return parsed as RawGuide;
+    }
+
+    lastIssues = issues;
+  }
+
+  throw new Error(`Guia gerado incompleto após ${GUIDE_GENERATION_MAX_ATTEMPTS} tentativas: ${lastIssues.join(' ')}`);
 }
 
 export const GuideService = {
   async getOrGenerate(propertyCode: string): Promise<GuideWithPlaces> {
     const guide = await GuideRepository.findByPropertyCode(propertyCode);
 
-    if (guide?.aiGeneratedAt) {
+    if (guide?.aiGeneratedAt && isGuidePlacesComplete(guide.places)) {
       return guide;
     }
 
@@ -70,44 +137,20 @@ export const GuideService = {
     const now = new Date();
     const prompt = buildGuidePrompt(property.name, property.address, now.getMonth() + 1);
 
-    let generated: RawGuide;
     try {
-      const raw = await generateJsonContent(GUIDE_SYSTEM_PROMPT, prompt);
-      generated = JSON.parse(raw) as RawGuide;
+      const generated = await generateValidatedGuide(prompt);
+
+      return GuideRepository.upsertGenerated(propertyCode, {
+        welcomeMessage: generated.welcomeMessage,
+        seasonalTips: generated.seasonalTips,
+        places: mapRawGuideToPlaces(generated),
+      });
     } catch (aiError) {
       if (guide && guide.places.length > 0) {
         return guide;
       }
       throw aiError;
     }
-
-    const places = [
-      ...(generated.restaurants ?? []).map((r) => ({
-        name: r.name,
-        category: 'restaurant' as const,
-        distance: r.distance,
-        description: r.description,
-      })),
-      ...(generated.attractions ?? []).map((a) => ({
-        name: a.name,
-        category: 'attraction' as const,
-        distance: a.distance,
-        description: a.description,
-      })),
-      ...(generated.essentials ?? []).map((e) => ({
-        name: e.name,
-        category: 'essential' as const,
-        placeType: e.placeType,
-        distance: e.distance,
-        description: e.description,
-      })),
-    ];
-
-    return GuideRepository.upsertGenerated(propertyCode, {
-      welcomeMessage: generated.welcomeMessage ?? '',
-      seasonalTips: generated.seasonalTips ?? '',
-      places,
-    });
   },
 
   buildChatContext(
