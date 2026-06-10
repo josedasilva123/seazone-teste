@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { MdChat, MdClose, MdSend, MdSmartToy } from 'react-icons/md';
 import { Button } from '@/components/shared/atoms';
 import { MarkdownContent } from '@/components/shared/molecules/MarkdownContent';
+import { ChatStreamingMessage } from './ChatStreamingMessage';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -36,6 +37,8 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [networkMessageIndex, setNetworkMessageIndex] = useState<number | null>(null);
+  const [streamingSession, setStreamingSession] = useState(0);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +76,10 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
+    const assistantIndex = newMessages.length;
     setIsStreaming(true);
+    setNetworkMessageIndex(assistantIndex);
+    setStreamingSession((s) => s + 1);
     setShowSuggestions(false);
 
     const assistantMessage: Message = { role: 'assistant', content: '' };
@@ -114,7 +120,10 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
 
       if (isFallback) setShowSuggestions(true);
     } catch (err) {
-      if ((err as Error).name === 'AbortError') return;
+      if ((err as Error).name === 'AbortError') {
+        setIsStreaming(false);
+        return;
+      }
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.role !== 'assistant') return prev;
@@ -124,8 +133,9 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
         ];
       });
       setShowSuggestions(true);
-    } finally {
       setIsStreaming(false);
+    } finally {
+      setNetworkMessageIndex(null);
     }
   }
 
@@ -187,8 +197,9 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
 
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
               {messages.map((msg, i) => {
-                const isStreamingThisMessage =
+                const isActiveAssistantMessage =
                   isStreaming && i === messages.length - 1 && msg.role === 'assistant';
+                const isReceivingFromNetwork = networkMessageIndex === i;
 
                 return (
                   <div
@@ -205,15 +216,20 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                     >
                       {msg.content ? (
                         msg.role === 'assistant' ? (
-                          isStreamingThisMessage ? (
-                            <span className="whitespace-pre-wrap">{msg.content}</span>
+                          isActiveAssistantMessage ? (
+                            <ChatStreamingMessage
+                              key={streamingSession}
+                              content={msg.content}
+                              isNetworkStreaming={isReceivingFromNetwork}
+                              onRevealComplete={() => setIsStreaming(false)}
+                            />
                           ) : (
                             <MarkdownContent content={msg.content} />
                           )
                         ) : (
                           msg.content
                         )
-                      ) : isStreamingThisMessage ? (
+                      ) : isReceivingFromNetwork ? (
                         <TypingIndicator />
                       ) : null}
                     </div>

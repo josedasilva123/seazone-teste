@@ -3,6 +3,8 @@ import { PropertyRepository } from '@/lib/repositories/property';
 import { iterateStreamText, streamChatContent } from '@/lib/ai';
 import { GuideService, ChatFallbackService } from '@/lib/services/guide';
 
+export const dynamic = 'force-dynamic';
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
