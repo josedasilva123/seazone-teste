@@ -50,9 +50,9 @@ export function PropertyHero({
   }
 
   return (
-    <div className="relative w-full aspect-video bg-gray-900 overflow-hidden grid grid-rows-[1fr_auto]">
+    <div className="relative w-full bg-gray-900 overflow-hidden">
 
-      {/* Fundo desfocado */}
+      {/* Fundo desfocado — preenche o container inteiro */}
       {sorted.length > 0 && (
         <img
           src={sorted[currentIndex].url}
@@ -79,17 +79,17 @@ export function PropertyHero({
         </span>
       )}
 
-      {/* Linha 1 do grid: carrossel (1fr) — min-h-0 impede overflow para a linha inferior */}
-      <div className="relative z-10 min-h-0 flex items-center justify-center px-4 pt-10 pb-2">
-        <div className="relative w-full max-w-[800px] h-full rounded-[--radius-xl] overflow-hidden shadow-2xl ring-1 ring-white/15">
+      {/* Carrossel: sempre 16/9, máx 800px */}
+      <div className="relative z-10 flex justify-center px-4 pt-10 pb-2">
+        <div className="relative w-full max-w-[800px] aspect-video rounded-[--radius-xl] overflow-hidden shadow-2xl ring-1 ring-white/15">
           {sorted.length > 0 ? (
             <img
               src={sorted[currentIndex].url}
               alt={sorted[currentIndex].alt || name}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-white/50 text-sm bg-gray-800">
+            <div className="absolute inset-0 flex items-center justify-center text-white/50 text-sm bg-gray-800">
               Sem fotos disponíveis
             </div>
           )}
@@ -129,7 +129,7 @@ export function PropertyHero({
         </div>
       </div>
 
-      {/* Linha 2 do grid: informações (auto) — sempre visível, nunca coberta */}
+      {/* Informações da propriedade */}
       <div className="relative z-10 px-5 pt-2 pb-4">
         <h1 className="text-base font-bold leading-snug text-white drop-shadow">{name}</h1>
         <div className="flex items-center gap-1.5 text-white/75 text-xs mt-0.5 mb-1">
