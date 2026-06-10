@@ -1,8 +1,15 @@
 export {
   DEFAULT_GEMINI_MODEL,
+  GeminiConfigError,
+  extractGeminiErrorMessage,
   generateJsonContent,
-  streamChatContent,
-  iterateStreamText,
+  getGeminiApiKey,
+  getGeminiModelName,
+  isGeminiAuthError,
+  isGeminiConfigured,
   isGeminiQuotaError,
+  iterateStreamText,
+  logGeminiError,
+  streamChatContent,
   type GeminiChatMessage,
 } from './gemini';

@@ -81,7 +81,7 @@ page.tsx → Server Action → Service → Repository → Prisma → PostgreSQL
 - Node.js 20+
 - npm 10+
 - PostgreSQL 14+ (instância local ou remota)
-- Chave de API do Google Gemini (opcional — o chat tem fallback sem IA)
+- Chave de API do Google Gemini (**obrigatória em produção** para o chat com IA; há fallback só em cota esgotada)
 
 ---
 
@@ -99,7 +99,7 @@ Crie um arquivo `.env` na raiz com:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/seazone?schema=public"
-GEMINI_API_KEY="AIza..."   # opcional — obtenha em https://aistudio.google.com/apikey
+GEMINI_API_KEY="AIza..."   # obrigatório em produção — obtenha em https://aistudio.google.com/apikey
 GEMINI_MODEL="gemini-2.0-flash"   # opcional — padrão: gemini-2.0-flash
 ```
 

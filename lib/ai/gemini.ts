@@ -11,22 +11,38 @@ export interface GeminiChatMessage {
   content: string;
 }
 
-function getApiKey(): string {
-  const apiKey = process.env.GEMINI_API_KEY;
+export class GeminiConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'GeminiConfigError';
+  }
+}
+
+export function getGeminiApiKey(): string | null {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  return apiKey || null;
+}
+
+export function isGeminiConfigured(): boolean {
+  return getGeminiApiKey() !== null;
+}
+
+export function getGeminiModelName(): string {
+  return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+}
+
+function assertGeminiConfigured(): string {
+  const apiKey = getGeminiApiKey();
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY não configurada');
+    throw new GeminiConfigError('GEMINI_API_KEY não configurada');
   }
   return apiKey;
 }
 
-function getModelName(): string {
-  return process.env.GEMINI_MODEL ?? DEFAULT_GEMINI_MODEL;
-}
-
 function createModel(options?: { json?: boolean; temperature?: number }) {
-  const genAI = new GoogleGenerativeAI(getApiKey());
+  const genAI = new GoogleGenerativeAI(assertGeminiConfigured());
   return genAI.getGenerativeModel({
-    model: getModelName(),
+    model: getGeminiModelName(),
     generationConfig: {
       temperature: options?.temperature,
       ...(options?.json ? { responseMimeType: 'application/json' as const } : {}),
@@ -39,6 +55,54 @@ function toGeminiContents(messages: GeminiChatMessage[]): Content[] {
     role: message.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: message.content }],
   }));
+}
+
+export function extractGeminiErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  return String(err);
+}
+
+export function isGeminiAuthError(err: unknown): boolean {
+  const msg = extractGeminiErrorMessage(err).toLowerCase();
+  return (
+    msg.includes('api key not valid')
+    || msg.includes('api_key_invalid')
+    || msg.includes('permission denied')
+    || msg.includes('unauthenticated')
+    || msg.includes('[401')
+    || msg.includes('[403')
+    || msg.includes(' 401 ')
+    || msg.includes(' 403 ')
+  );
+}
+
+export function isGeminiQuotaError(err: unknown): boolean {
+  if (err instanceof GeminiConfigError || isGeminiAuthError(err)) return false;
+
+  const msg = extractGeminiErrorMessage(err).toLowerCase();
+  return (
+    msg.includes('429')
+    || msg.includes('resource_exhausted')
+    || msg.includes('resource exhausted')
+    || msg.includes('rate limit')
+    || msg.includes('rate_limit')
+    || msg.includes('too many requests')
+    || msg.includes('quota exceeded')
+    || msg.includes('exceeded your current quota')
+    || msg.includes('insufficient_quota')
+  );
+}
+
+export function logGeminiError(context: string, err: unknown): void {
+  const message = extractGeminiErrorMessage(err);
+  console.error(`[gemini/${context}]`, {
+    message,
+    model: getGeminiModelName(),
+    configured: isGeminiConfigured(),
+    quota: isGeminiQuotaError(err),
+    auth: isGeminiAuthError(err),
+    config: err instanceof GeminiConfigError,
+  });
 }
 
 export async function generateJsonContent(
@@ -78,16 +142,4 @@ export async function* iterateStreamText(
       // chunk sem conteúdo textual
     }
   }
-}
-
-export function isGeminiQuotaError(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-  const msg = err.message.toLowerCase();
-  return (
-    msg.includes('429')
-    || msg.includes('quota')
-    || msg.includes('rate limit')
-    || msg.includes('resource_exhausted')
-    || msg.includes('resource exhausted')
-  );
 }
