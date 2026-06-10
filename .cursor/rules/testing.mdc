@@ -63,14 +63,34 @@ describe('Button', () => {
 - **O que cobrir:** fluxos completos envolvendo múltiplos componentes (ex: preencher formulário → submeter → ver feedback).
 - Podem usar `vi.mock` para serviços externos (API, router), mas **não** para componentes internos.
 
+> **Exigência:** todo fluxo user-facing (jornada completa do usuário) **DEVE** ter pelo menos um teste de integração em `tests/integration/[domain]/`. Ao implementar ou alterar um fluxo, verifique se o teste de integração correspondente existe; se não existir, crie-o na mesma entrega.
+
+### Fluxos obrigatórios por domínio
+
+| Domínio | Fluxo | Arquivo |
+|---|---|---|
+| `property` | Guia do imóvel (page → template → seções) | `tests/integration/property/PropertyGuidePage.test.tsx` |
+| `property` | Assistente virtual (abrir chat → pergunta → resposta/stream) | `tests/integration/property/ChatAssistantFlow.test.tsx` |
+
+Ao adicionar um novo domínio ou fluxo user-facing, **registre-o nesta tabela** e crie o arquivo de teste correspondente.
+
+### Checklist antes de concluir uma feature
+
+1. Testes unitários dos componentes/funções tocados.
+2. Teste de integração do fluxo completo (se user-facing).
+3. Mocks apenas em fronteiras externas (`fetch`, Server Actions, router) — nunca em componentes internos do fluxo.
+
 ```
 tests/
   setup.ts
   integration/
+    property/
+      PropertyGuidePage.test.tsx   ✅ page → guia completo
+      ChatAssistantFlow.test.tsx   ✅ chat com typewriter + markdown
     booking/
-      BookingFlow.test.tsx   ✅ fluxo completo de reserva
+      BookingFlow.test.tsx         ✅ fluxo completo de reserva
     auth/
-      LoginFlow.test.tsx     ✅ fluxo de autenticação
+      LoginFlow.test.tsx           ✅ fluxo de autenticação
 ```
 
 ### Estrutura mínima de um teste de integração

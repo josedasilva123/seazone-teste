@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import PropertyGuidePage from '@/app/[code]/page';
+import { mockExperienceGuide } from './fixtures';
 
 vi.mock('@/lib/actions/property', () => ({
   getPropertyByCode: vi.fn(),
@@ -19,6 +20,8 @@ vi.mock('next/link', () => ({
 Object.assign(navigator, {
   clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
 });
+
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 import { getPropertyByCode } from '@/lib/actions/property';
 
@@ -97,6 +100,14 @@ const mockProperty = {
 describe('PropertyGuidePage — integração', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('fetch', vi.fn());
+    vi.mocked(fetch).mockResolvedValue({
+      json: async () => ({ ok: true, data: mockExperienceGuide }),
+    } as Response);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('renderiza o guia completo quando o imóvel existe', async () => {
@@ -136,7 +147,6 @@ describe('PropertyGuidePage — integração', () => {
     const ui = await PropertyGuidePage({ params: Promise.resolve({ code: 'FLN001' }) });
     render(ui);
 
-    // Aparece na strip de referência rápida E na seção de regras
     expect(screen.getAllByText(/A partir das 15:00/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/Até as 11:00/i).length).toBeGreaterThanOrEqual(1);
   });
@@ -148,6 +158,30 @@ describe('PropertyGuidePage — integração', () => {
     render(ui);
 
     expect(screen.getByText('Ana Paula')).toBeInTheDocument();
+  });
+
+  it('renderiza o guia de experiências após carregar dados da API', async () => {
+    vi.mocked(getPropertyByCode).mockResolvedValue({ ok: true, data: mockProperty });
+
+    const ui = await PropertyGuidePage({ params: Promise.resolve({ code: 'FLN001' }) });
+    render(ui);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Bem-vindo ao apartamento em Florianópolis/i)).toBeInTheDocument();
+    });
+
+    expect(fetch).toHaveBeenCalledWith('/api/FLN001/guide', { method: 'GET' });
+    expect(screen.getByText('Box 32')).toBeInTheDocument();
+  });
+
+  it('disponibiliza o assistente virtual integrado à página', async () => {
+    vi.mocked(getPropertyByCode).mockResolvedValue({ ok: true, data: mockProperty });
+
+    const ui = await PropertyGuidePage({ params: Promise.resolve({ code: 'FLN001' }) });
+    render(ui);
+
+    expect(screen.getByRole('button', { name: /Abrir assistente virtual/i })).toBeInTheDocument();
+    expect(screen.getByText(/Apartamento Beira-Mar Florianópolis/i)).toBeInTheDocument();
   });
 
   it('chama notFound quando o imóvel não existe', async () => {

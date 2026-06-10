@@ -3,6 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ChatAssistant } from '.';
 
+vi.mock('@/components/shared/molecules/TypewriterMarkdown', async () => {
+  const { MarkdownContent } = await import('@/components/shared/molecules/MarkdownContent');
+  return {
+    TypewriterMarkdown: ({ content }: { content: string }) => (
+      <MarkdownContent content={content} />
+    ),
+  };
+});
+
 // jsdom doesn't implement scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 

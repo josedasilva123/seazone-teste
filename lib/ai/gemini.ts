@@ -4,7 +4,7 @@ import {
   type GenerateContentStreamResult,
 } from '@google/generative-ai';
 
-export const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash';
+export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 export interface GeminiChatMessage {
   role: 'user' | 'assistant';
