@@ -3,7 +3,6 @@
 :root {
   /* Surfaces */
   --background: #f8fafc;
-  --foreground: #0f172a;
   --surface: #ffffff;
   --surface-secondary: #f1f5f9;
 
@@ -21,11 +20,6 @@
   /* Brand — Seazone Navy */
   --brand-navy: #00143d;
 
-  /* Check-in / Check-out iconography */
-  --checkin-icon-bg: #ebf2ff;
-  --checkout-icon-bg: #ffebee;
-  --checkout-icon: #e53935;
-
   /* Accent — Teal */
   --accent: #0ea5a0;
   --accent-light: #e6f9f8;
@@ -38,7 +32,6 @@
 
   /* Border */
   --border: #e2e8f0;
-  --border-strong: #cbd5e1;
 
   /* Semantic */
   --success: #16a34a;
@@ -66,7 +59,6 @@
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-secondary: var(--surface-secondary);
   --color-primary: var(--primary);
@@ -77,9 +69,6 @@
   --color-primary-action-hover: var(--primary-action-hover);
   --color-primary-action-light: var(--primary-action-light);
   --color-brand-navy: var(--brand-navy);
-  --color-checkin-icon-bg: var(--checkin-icon-bg);
-  --color-checkout-icon-bg: var(--checkout-icon-bg);
-  --color-checkout-icon: var(--checkout-icon);
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
   --color-text-heading: var(--text-heading);
@@ -87,7 +76,6 @@
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
   --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
   --color-success: var(--success);
   --color-success-light: var(--success-light);
   --color-danger: var(--danger);

@@ -16,11 +16,11 @@ describe('CheckInOutCard', () => {
 
   it('aplica fundo azul claro no ícone de check-in', () => {
     const { container } = render(<CheckInOutCard type="check-in" time="15h" />);
-    expect(container.querySelector('.bg-checkin-icon-bg')).toBeInTheDocument();
+    expect(container.querySelector('.bg-primary-light')).toBeInTheDocument();
   });
 
   it('aplica fundo vermelho claro no ícone de check-out', () => {
     const { container } = render(<CheckInOutCard type="check-out" time="11h" />);
-    expect(container.querySelector('.bg-checkout-icon-bg')).toBeInTheDocument();
+    expect(container.querySelector('.bg-danger-light')).toBeInTheDocument();
   });
 });

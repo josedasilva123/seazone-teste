@@ -22,15 +22,15 @@ const config: Record<
     title: 'Check-in',
     formatTime: (time) => `A partir das ${time}`,
     icon: <MdEventAvailable size={24} aria-hidden />,
-    iconBg: 'bg-checkin-icon-bg',
+    iconBg: 'bg-primary-light',
     iconColor: 'text-primary',
   },
   'check-out': {
     title: 'Check-out',
     formatTime: (time) => `Até as ${time}`,
     icon: <MdAccessTime size={24} aria-hidden />,
-    iconBg: 'bg-checkout-icon-bg',
-    iconColor: 'text-checkout-icon',
+    iconBg: 'bg-danger-light',
+    iconColor: 'text-danger',
   },
 };
 
