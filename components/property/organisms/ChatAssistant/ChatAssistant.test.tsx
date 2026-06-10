@@ -187,7 +187,7 @@ describe('ChatAssistant', () => {
     expect(screen.queryByText(/\*\*Capivari/)).not.toBeInTheDocument();
   });
 
-  it('renderiza código inline após streaming concluir', async () => {
+  it('renderiza código inline nas respostas do assistente', async () => {
     vi.mocked(fetch).mockResolvedValue(
       createMockResponse('A senha do WiFi é `paraty2024`.'),
     );

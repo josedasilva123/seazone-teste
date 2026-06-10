@@ -1,6 +1,13 @@
 import { GuideRepository } from '@/lib/repositories/guide';
 import { PropertyRepository } from '@/lib/repositories/property';
-import { iterateStreamText, streamChatContent } from '@/lib/ai';
+import {
+  GeminiConfigError,
+  isGeminiConfigured,
+  isGeminiQuotaError,
+  iterateStreamText,
+  logGeminiError,
+  streamChatContent,
+} from '@/lib/ai';
 import { GuideService, ChatFallbackService } from '@/lib/services/guide';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +27,9 @@ const FALLBACK_HEADERS = {
   ...RESPONSE_HEADERS,
   'X-Is-Fallback': 'true',
 };
+
+const UNAVAILABLE_MESSAGE =
+  'Desculpe, o assistente está temporariamente indisponível. Por favor, tente novamente em alguns instantes.';
 
 function streamText(text: string): ReadableStream {
   const encoder = new TextEncoder();
@@ -59,6 +69,11 @@ export async function POST(
     return new Response('Imóvel não encontrado', { status: 404 });
   }
 
+  if (!isGeminiConfigured()) {
+    logGeminiError('chat/config', new GeminiConfigError('GEMINI_API_KEY ausente no ambiente'));
+    return new Response(UNAVAILABLE_MESSAGE, { status: 503, headers: RESPONSE_HEADERS });
+  }
+
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
   const systemPrompt = GuideService.buildChatContext(property, guide);
 
@@ -72,18 +87,26 @@ export async function POST(
           for await (const text of iterateStreamText(completion.stream)) {
             controller.enqueue(encoder.encode(text));
           }
-        } finally {
           controller.close();
+        } catch (err) {
+          logGeminiError('chat/stream', err);
+          controller.error(err);
         }
       },
     });
 
     return new Response(stream, { headers: RESPONSE_HEADERS });
   } catch (err) {
-    const fallbackText = ChatFallbackService.isQuotaError(err)
-      ? ChatFallbackService.respond(lastUserMessage, property, guide)
-      : 'Desculpe, o assistente está temporariamente indisponível. Por favor, tente novamente em alguns instantes.';
+    logGeminiError('chat/request', err);
 
-    return new Response(streamText(fallbackText), { headers: FALLBACK_HEADERS });
+    if (isGeminiQuotaError(err)) {
+      const fallbackText = ChatFallbackService.respond(lastUserMessage, property, guide);
+      return new Response(streamText(fallbackText), { headers: FALLBACK_HEADERS });
+    }
+
+    return new Response(
+      streamText(UNAVAILABLE_MESSAGE),
+      { status: 503, headers: RESPONSE_HEADERS },
+    );
   }
 }
