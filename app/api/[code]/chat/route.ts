@@ -2,20 +2,19 @@ import { GuideRepository } from '@/lib/repositories/guide';
 import { PropertyRepository } from '@/lib/repositories/property';
 import {
   GeminiConfigError,
+  detectPromptInjection,
+  INJECTION_REFUSAL_MESSAGE,
   isGeminiConfigured,
   isGeminiQuotaError,
   iterateStreamText,
   logGeminiError,
+  prepareChatMessagesForLlm,
   streamChatContent,
 } from '@/lib/ai';
 import { GuideService, ChatFallbackService } from '@/lib/services/guide';
+import { chatRequestSchema } from '@/lib/validations/chat';
 
 export const dynamic = 'force-dynamic';
-
-interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
 
 const RESPONSE_HEADERS = {
   'Content-Type': 'text/plain; charset=utf-8',
@@ -52,13 +51,19 @@ export async function POST(
   const { code } = await params;
   const propertyCode = code.toUpperCase();
 
-  let messages: ChatMessage[];
+  let body: unknown;
   try {
-    const body = await request.json() as { messages?: ChatMessage[] };
-    messages = body.messages ?? [];
+    body = await request.json();
   } catch {
     return new Response('Corpo da requisição inválido', { status: 400 });
   }
+
+  const parsed = chatRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return new Response('Dados da conversa inválidos', { status: 400 });
+  }
+
+  const messages = parsed.data.messages;
 
   const [property, guide] = await Promise.all([
     PropertyRepository.findByCode(propertyCode),
@@ -69,16 +74,22 @@ export async function POST(
     return new Response('Imóvel não encontrado', { status: 404 });
   }
 
+  const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+
+  if (detectPromptInjection(lastUserMessage)) {
+    return new Response(streamText(INJECTION_REFUSAL_MESSAGE), { headers: RESPONSE_HEADERS });
+  }
+
   if (!isGeminiConfigured()) {
     logGeminiError('chat/config', new GeminiConfigError('GEMINI_API_KEY ausente no ambiente'));
     return new Response(UNAVAILABLE_MESSAGE, { status: 503, headers: RESPONSE_HEADERS });
   }
 
-  const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
   const systemPrompt = GuideService.buildChatContext(property, guide);
+  const llmMessages = prepareChatMessagesForLlm(messages);
 
   try {
-    const completion = await streamChatContent(systemPrompt, messages);
+    const completion = await streamChatContent(systemPrompt, llmMessages, 0.2);
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
