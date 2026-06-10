@@ -3,12 +3,15 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'whatsapp';
 type Size = 'sm' | 'md' | 'lg';
 
-type CommonProps = {
+type ButtonStyleProps = {
   variant?: Variant;
   size?: Size;
-  children: ReactNode;
   fullWidth?: boolean;
   className?: string;
+};
+
+type CommonProps = ButtonStyleProps & {
+  children?: ReactNode;
 };
 
 type ButtonAsButton = CommonProps &
@@ -43,7 +46,7 @@ function getButtonClasses({
   size = 'md',
   fullWidth = false,
   className = '',
-}: CommonProps) {
+}: ButtonStyleProps) {
   return [
     'inline-flex items-center justify-center font-medium rounded-[--radius-md] transition-all duration-150 cursor-pointer',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
@@ -65,7 +68,7 @@ export function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const classes = getButtonClasses({ variant, size, fullWidth, className, children });
+  const classes = getButtonClasses({ variant, size, fullWidth, className });
 
   if ('href' in props && props.href) {
     const { href, ...anchorProps } = props;
