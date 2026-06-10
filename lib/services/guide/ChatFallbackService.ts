@@ -51,7 +51,7 @@ const RULES: Rule[] = [
       const restaurants = guide?.places.filter((p) => p.category === 'restaurant') ?? [];
       if (restaurants.length === 0) return 'Não tenho informações sobre restaurantes próximos no momento.';
       const list = restaurants
-        .map((r) => `• **${r.name}** (${r.distance}) — ${r.description}`)
+        .map((r) => `- **${r.name}** (${r.distance}) — ${r.description}`)
         .join('\n');
       return `Aqui estão os restaurantes próximos:\n\n${list}`;
     },
@@ -62,7 +62,7 @@ const RULES: Rule[] = [
       const attractions = guide?.places.filter((p) => p.category === 'attraction') ?? [];
       if (attractions.length === 0) return 'Não tenho informações sobre atrações próximas no momento.';
       const list = attractions
-        .map((a) => `• **${a.name}** (${a.distance}) — ${a.description}`)
+        .map((a) => `- **${a.name}** (${a.distance}) — ${a.description}`)
         .join('\n');
       return `Atrações próximas ao imóvel:\n\n${list}`;
     },
@@ -73,7 +73,7 @@ const RULES: Rule[] = [
       const essentials = guide?.places.filter((p) => p.category === 'essential') ?? [];
       if (essentials.length === 0) return 'Não tenho informações sobre serviços essenciais próximos no momento.';
       const list = essentials
-        .map((e) => `• **${e.name}** (${e.distance}) — ${e.description}`)
+        .map((e) => `- **${e.name}** (${e.distance}) — ${e.description}`)
         .join('\n');
       return `Serviços essenciais próximos:\n\n${list}`;
     },

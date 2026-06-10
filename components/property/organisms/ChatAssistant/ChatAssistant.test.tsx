@@ -182,7 +182,24 @@ describe('ChatAssistant', () => {
       expect(bold.tagName).toBe('STRONG');
     });
 
+    expect(screen.getAllByTestId('markdown-content').length).toBeGreaterThanOrEqual(2);
+
     expect(screen.queryByText(/\*\*Capivari/)).not.toBeInTheDocument();
+  });
+
+  it('renderiza código inline após streaming concluir', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      createMockResponse('A senha do WiFi é `paraty2024`.'),
+    );
+
+    render(<ChatAssistant code="FLN001" />);
+    await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+    await userEvent.click(screen.getByText('Qual a senha do WiFi?'));
+
+    await waitFor(() => {
+      const code = screen.getByText('paraty2024');
+      expect(code.tagName).toBe('CODE');
+    });
   });
 
   it('exibe sugestões novamente quando ocorre erro de rede', async () => {

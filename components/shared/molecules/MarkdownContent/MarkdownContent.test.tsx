@@ -4,6 +4,7 @@ import { MarkdownContent } from '.';
 describe('MarkdownContent', () => {
   it('renderiza texto simples', () => {
     render(<MarkdownContent content="Olá, visitante!" />);
+    expect(screen.getByTestId('markdown-content')).toBeInTheDocument();
     expect(screen.getByText('Olá, visitante!')).toBeInTheDocument();
   });
 
@@ -11,6 +12,19 @@ describe('MarkdownContent', () => {
     render(<MarkdownContent content="**Capivari:** centro da cidade" />);
     const bold = screen.getByText('Capivari:');
     expect(bold.tagName).toBe('STRONG');
+  });
+
+  it('renderiza código inline com backticks', () => {
+    render(<MarkdownContent content="A senha do WiFi é `paraty2024`." />);
+    const code = screen.getByText('paraty2024');
+    expect(code.tagName).toBe('CODE');
+    expect(screen.queryByText('`paraty2024`')).not.toBeInTheDocument();
+  });
+
+  it('normaliza aspas tipográficas da IA em código inline', () => {
+    render(<MarkdownContent content={'A senha é \u2018paraty2024\u2019.'} />);
+    const code = screen.getByText('paraty2024');
+    expect(code.tagName).toBe('CODE');
   });
 
   it('renderiza lista com itens em negrito', () => {

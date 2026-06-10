@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MdChat, MdClose, MdSend, MdSmartToy } from 'react-icons/md';
 import { Button } from '@/components/shared/atoms';
-import { MarkdownContent } from '@/components/shared/molecules';
+import { MarkdownContent } from '@/components/shared/molecules/MarkdownContent';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -186,31 +186,40 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
-              {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={['flex', msg.role === 'user' ? 'justify-end' : 'justify-start'].join(' ')}
-                >
+              {messages.map((msg, i) => {
+                const isStreamingThisMessage =
+                  isStreaming && i === messages.length - 1 && msg.role === 'assistant';
+
+                return (
                   <div
-                    className={[
-                      'max-w-[82%] rounded-[--radius-lg] px-3 py-2 text-sm leading-relaxed',
-                      msg.role === 'user'
-                        ? 'bg-primary text-white rounded-br-sm'
-                        : 'bg-surface-secondary text-text-body rounded-bl-sm border border-border',
-                    ].join(' ')}
+                    key={i}
+                    className={['flex', msg.role === 'user' ? 'justify-end' : 'justify-start'].join(' ')}
                   >
-                    {msg.content ? (
-                      msg.role === 'assistant' ? (
-                        <MarkdownContent content={msg.content} />
-                      ) : (
-                        msg.content
-                      )
-                    ) : msg.role === 'assistant' && isStreaming && i === messages.length - 1 ? (
-                      <TypingIndicator />
-                    ) : null}
+                    <div
+                      className={[
+                        'max-w-[82%] rounded-[--radius-lg] px-3 py-2 text-sm leading-relaxed',
+                        msg.role === 'user'
+                          ? 'bg-primary text-white rounded-br-sm'
+                          : 'bg-surface-secondary text-text-body rounded-bl-sm border border-border',
+                      ].join(' ')}
+                    >
+                      {msg.content ? (
+                        msg.role === 'assistant' ? (
+                          isStreamingThisMessage ? (
+                            <span className="whitespace-pre-wrap">{msg.content}</span>
+                          ) : (
+                            <MarkdownContent content={msg.content} />
+                          )
+                        ) : (
+                          msg.content
+                        )
+                      ) : isStreamingThisMessage ? (
+                        <TypingIndicator />
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {(messages.length <= 1 || showSuggestions) && (
                 <div className="flex flex-col gap-2 pt-1">
