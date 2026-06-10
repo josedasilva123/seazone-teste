@@ -16,7 +16,6 @@ export default async function HomePage() {
       <AppHeader />
 
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8">
-        {/* Hero */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-text-heading tracking-tight">
             Guia Digital do Hóspede

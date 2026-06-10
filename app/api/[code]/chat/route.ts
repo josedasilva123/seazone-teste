@@ -16,7 +16,6 @@ const RESPONSE_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
 };
 
-/** Simula streaming palavra a palavra para o fallback */
 function streamFallback(text: string): ReadableStream {
   const encoder = new TextEncoder();
   const words = text.split(/(?<=\s)/);
@@ -78,7 +77,6 @@ export async function POST(
           if (text) controller.enqueue(encoder.encode(text));
         }
       } catch (err) {
-        // Fallback baseado em regras quando a IA não está disponível (quota, rede, etc.)
         const fallbackText = ChatFallbackService.isQuotaError(err)
           ? ChatFallbackService.respond(lastUserMessage, property, guide)
           : 'Desculpe, o assistente está temporariamente indisponível. Por favor, tente novamente em alguns instantes.';

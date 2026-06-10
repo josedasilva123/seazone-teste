@@ -52,7 +52,6 @@ export function PropertyHero({
   return (
     <div className="relative w-full bg-gray-900 overflow-hidden">
 
-      {/* Fundo desfocado — preenche o container inteiro */}
       {sorted.length > 0 && (
         <img
           src={sorted[currentIndex].url}
@@ -62,17 +61,14 @@ export function PropertyHero({
         />
       )}
 
-      {/* Overlay escuro */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/25" />
 
-      {/* Badge tipo — canto superior esquerdo */}
       <div className="absolute top-3 left-4 z-10">
         <span className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-primary text-white shadow">
           {propertyType}
         </span>
       </div>
 
-      {/* Contador de fotos — canto superior direito */}
       {total > 1 && (
         <span className="absolute top-3 right-4 z-10 text-xs text-white bg-black/50 rounded-full px-2.5 py-1 backdrop-blur-sm">
           {currentIndex + 1} / {total}
@@ -129,7 +125,6 @@ export function PropertyHero({
         </div>
       </div>
 
-      {/* Informações da propriedade */}
       <div className="relative z-10 px-5 pt-2 pb-4">
         <h1 className="text-base font-bold leading-snug text-white drop-shadow">{name}</h1>
         <div className="flex items-center gap-1.5 text-white/75 text-xs mt-0.5 mb-1">

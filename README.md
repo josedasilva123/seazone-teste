@@ -1,36 +1,170 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Seazone — Guia Digital do Hóspede
 
-## Getting Started
+Aplicação web que entrega aos hóspedes um guia digital completo da propriedade alugada: informações de acesso, WiFi, regras da estadia, contato do anfitrião, guia local gerado por IA e assistente virtual via chat.
 
-First, run the development server:
+---
+
+## Funcionalidades
+
+- **Listagem de imóveis** com paginação e filtros
+- **Guia do hóspede** por código de imóvel: WiFi, check-in/out, comodidades, regras, acesso e anfitrião
+- **Guia local com IA** gerado sob demanda via OpenAI (restaurantes, atrações, serviços essenciais)
+- **Chat assistente** com streaming de respostas e fallback baseado em regras quando a cota da API está esgotada
+- **Metadados dinâmicos** (Open Graph / SEO) por imóvel
+
+---
+
+## Stack
+
+| Camada | Tecnologia |
+|---|---|
+| Framework | Next.js 16 (App Router, Server Actions) |
+| Banco de dados | SQLite via Prisma 7 + `better-sqlite3` |
+| ORM | Prisma 7 com driver adapter |
+| IA | OpenAI `gpt-4o-mini` |
+| Validação | Zod 4 |
+| UI | React 19 + Tailwind CSS 4 |
+| Ícones | react-icons |
+| Testes | Vitest 4 + React Testing Library + jsdom |
+| Linguagem | TypeScript 5 |
+
+---
+
+## Arquitetura
+
+### Estrutura de pastas
+
+```
+app/                        # Rotas Next.js (App Router)
+  page.tsx                  # Listagem de imóveis
+  [code]/page.tsx           # Guia do hóspede por código
+  api/[code]/
+    guide/route.ts          # GET — gera/retorna guia local
+    chat/route.ts           # POST — streaming do chat assistente
+
+components/
+  shared/                   # Componentes reutilizáveis entre domínios
+    atoms/                  # Button, Badge, Divider
+    molecules/              # InfoCard, SectionTitle
+    organisms/              # AppHeader
+  property/                 # Componentes do domínio de imóveis
+    atoms/                  # AmenityIcon, RuleStatus, PropertyCardSkeleton
+    molecules/              # PropertyCard, WifiCard, AccessCard, HostCard, RuleItem…
+    organisms/              # PropertyHero, AmenitiesSection, ChatAssistant…
+    templates/              # PropertyGuideTemplate
+
+lib/
+  db/index.ts               # Prisma Client singleton
+  actions/                  # Server Actions (entrada pública)
+  services/                 # Lógica de negócio
+  repositories/             # Acesso ao banco (Prisma)
+  validations/              # Schemas Zod
+
+prisma/
+  schema.prisma             # Modelos do banco
+  seed.ts                   # Dados de exemplo (FLN001, GRM001)
+
+scripts/
+  mark-guides-generated.ts  # Utilitário: marca guias existentes como gerados
+```
+
+### Fluxo de dados
+
+```
+page.tsx → Server Action → Service → Repository → Prisma → SQLite
+```
+
+---
+
+## Pré-requisitos
+
+- Node.js 20+
+- npm 10+
+- Chave de API da OpenAI (opcional — o chat tem fallback sem IA)
+
+---
+
+## Configuração
+
+### 1. Instalar dependências
+
+```bash
+npm install
+```
+
+### 2. Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz com:
+
+```env
+DATABASE_URL="file:./prisma/dev.db"
+OPENAI_API_KEY="sk-..."   # opcional
+```
+
+### 3. Banco de dados
+
+```bash
+# Gerar o Prisma Client
+npx prisma generate
+
+# Criar o banco e aplicar as migrations
+npx prisma migrate dev
+
+# Popular com dados de exemplo
+npx prisma db seed
+```
+
+### 4. Iniciar em desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Imóveis de exemplo
 
-## Learn More
+| Código | Imóvel |
+|---|---|
+| `FLN001` | Apartamento Beira-Mar — Florianópolis, SC |
+| `GRM001` | Chalé Serra — Gramado, RS |
 
-To learn more about Next.js, take a look at the following resources:
+Acesse o guia de um imóvel em `/[CODIGO]`, por exemplo: [http://localhost:3000/FLN001](http://localhost:3000/FLN001).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts disponíveis
 
-## Deploy on Vercel
+```bash
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build de produção
+npm run start        # Servidor de produção
+npm run lint         # Linter (ESLint)
+npm test             # Testes em modo watch
+npm run test:run     # Testes (execução única — CI)
+npm run test:ui      # Interface visual do Vitest
+npm run coverage     # Relatório de cobertura
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Scripts Prisma
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npx prisma generate          # Regerar Client após alterar o schema
+npx prisma migrate dev       # Criar e aplicar migration em dev
+npx prisma migrate deploy    # Aplicar migrations em produção
+npx prisma studio            # GUI visual do banco
+npx prisma db seed           # Popular com dados de exemplo
+```
+
+---
+
+## Testes
+
+Os testes unitários ficam junto ao componente/serviço (`*.test.tsx` / `*.test.ts`). Os testes de integração ficam em `tests/integration/`.
+
+```bash
+npm run test:run     # Execução única
+npm run coverage     # Com relatório de cobertura
+```

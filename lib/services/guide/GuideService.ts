@@ -87,7 +87,6 @@ export const GuideService = {
       const raw = completion.choices[0]?.message?.content ?? '{}';
       generated = JSON.parse(raw) as RawGuide;
     } catch (aiError) {
-      // Se a IA falhar (quota, rede, etc.) e já existir guia com dados, retorna-o como fallback
       if (guide && guide.places.length > 0) {
         return guide;
       }

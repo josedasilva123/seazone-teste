@@ -1,0 +1,37 @@
+name: Testes
+
+on:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    name: Executar testes
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: "file:./prisma/dev.db"
+      OPENAI_API_KEY: "sk-test-placeholder"
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Aplicar migrações (SQLite)
+        run: npx prisma migrate deploy
+
+      - name: Executar testes
+        run: npm run test:run

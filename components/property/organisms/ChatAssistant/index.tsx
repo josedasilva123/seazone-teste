@@ -132,7 +132,6 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
 
   return (
     <>
-      {/* Floating button */}
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Abrir assistente virtual"
@@ -147,21 +146,17 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
         <span>Assistente</span>
       </button>
 
-      {/* Chat drawer overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-end sm:justify-end sm:p-6">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 sm:hidden"
             onClick={handleClose}
             aria-hidden
           />
 
-          {/* Chat panel */}
           <div className="relative z-10 w-full sm:w-96 flex flex-col bg-surface rounded-t-[--radius-xl] sm:rounded-[--radius-xl] shadow-lg border border-border overflow-hidden"
             style={{ height: 'min(560px, 85dvh)' }}
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-primary text-white shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -181,7 +176,6 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
               </button>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
               {messages.map((msg, i) => (
                 <div
@@ -203,7 +197,6 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                 </div>
               ))}
 
-              {/* Suggested questions — shown before first user message */}
               {messages.length <= 1 && (
                 <div className="flex flex-col gap-2 pt-1">
                   <p className="text-xs text-text-muted text-center">Perguntas sugeridas:</p>
@@ -223,7 +216,6 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             <form
               onSubmit={handleSubmit}
               className="flex items-center gap-2 px-3 py-3 border-t border-border bg-surface shrink-0"
