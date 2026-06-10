@@ -84,9 +84,8 @@ export function PropertyList({
   return (
     <div>
       <p className="text-sm text-text-muted mb-4">
-        <span className="font-medium text-text-body">{initialTotal}</span> imóvel
-        {initialTotal !== 1 ? 'is' : ''} disponível
-        {initialTotal !== 1 ? 's' : ''}
+        <span className="font-medium text-text-body">{initialTotal}</span>{' '}
+        {initialTotal === 1 ? 'imóvel disponível' : 'imóveis disponíveis'}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -121,9 +120,11 @@ export function PropertyList({
       )}
 
       {!hasMore && items.length > 0 && (
-        <p className="text-center text-text-subtle text-sm py-10">
-          Você viu todos os {initialTotal} imóvel{initialTotal !== 1 ? 'is' : ''}
-        </p>
+      <p className="text-center text-text-subtle text-sm py-10">
+        {initialTotal === 1
+          ? 'Você viu o único imóvel disponível'
+          : `Você viu todos os ${initialTotal} imóveis`}
+      </p>
       )}
 
       {/* Sentinel invisível — dispara o IntersectionObserver */}

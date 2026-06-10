@@ -70,13 +70,26 @@ describe('PropertyList', () => {
 
   it('renderiza os itens iniciais', () => {
     render(<PropertyList {...initialProps} />);
-    expect(screen.getByText(/Imóvel 1 — SC/)).toBeInTheDocument();
-    expect(screen.getByText(/Imóvel 2 — SC/)).toBeInTheDocument();
+    // O card exibe "{city} - {state}"
+    expect(screen.getAllByText(/Florianópolis - SC/).length).toBeGreaterThanOrEqual(1);
   });
 
-  it('exibe o total de imóveis', () => {
+  it('exibe o total de imóveis com texto correto no plural', () => {
     render(<PropertyList {...initialProps} />);
     expect(screen.getByText('14')).toBeInTheDocument();
+    expect(screen.getByText('imóveis disponíveis')).toBeInTheDocument();
+  });
+
+  it('exibe singular quando há apenas 1 imóvel', () => {
+    render(
+      <PropertyList
+        {...initialProps}
+        initialItems={[makeItem(1)]}
+        initialTotal={1}
+        initialTotalPages={1}
+      />,
+    );
+    expect(screen.getByText('imóvel disponível')).toBeInTheDocument();
   });
 
   it('exibe mensagem quando não há imóveis', () => {

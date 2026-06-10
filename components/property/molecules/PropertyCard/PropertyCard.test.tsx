@@ -15,14 +15,20 @@ const defaultProps = {
 };
 
 describe('PropertyCard', () => {
-  it('renderiza o nome e o estado do imóvel', () => {
+  it('renderiza cidade e estado no formato correto', () => {
     render(<PropertyCard {...defaultProps} />);
-    expect(screen.getByText(/Chalé Vista Serra — SP/)).toBeInTheDocument();
+    expect(screen.getByText('Campos do Jordão - SP')).toBeInTheDocument();
   });
 
   it('renderiza o preço formatado em BRL quando fornecido', () => {
     render(<PropertyCard {...defaultProps} dailyRateFrom={162} />);
     expect(screen.getByText(/R\$\s*162,00/)).toBeInTheDocument();
+  });
+
+  it('o preço está em cor primary', () => {
+    render(<PropertyCard {...defaultProps} dailyRateFrom={162} />);
+    const priceEl = screen.getByText(/Diárias a partir de/);
+    expect(priceEl).toHaveClass('text-primary');
   });
 
   it('exibe texto alternativo quando não há preço', () => {
@@ -35,23 +41,21 @@ describe('PropertyCard', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', '/CDJ001');
   });
 
-  it('renderiza imagem de capa com alt correto', () => {
-    render(
-      <PropertyCard
-        {...defaultProps}
-        coverImage={{ url: '/foto.jpg', alt: 'Vista da serra' }}
-      />
-    );
-    expect(screen.getByRole('img', { name: 'Vista da serra' })).toBeInTheDocument();
-  });
-
-  it('usa alt padrão quando alt da imagem não é fornecido', () => {
+  it('renderiza imagem de capa com alt padrão usando cidade/estado', () => {
     render(
       <PropertyCard {...defaultProps} coverImage={{ url: '/foto.jpg' }} />
     );
-    expect(
-      screen.getByRole('img', { name: /Chalé Vista Serra — Campos do Jordão\/SP/ })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Campos do Jordão – SP/ })).toBeInTheDocument();
+  });
+
+  it('usa alt personalizado quando fornecido', () => {
+    render(
+      <PropertyCard
+        {...defaultProps}
+        coverImage={{ url: '/foto.jpg', alt: 'Vista da varanda' }}
+      />
+    );
+    expect(screen.getByRole('img', { name: 'Vista da varanda' })).toBeInTheDocument();
   });
 
   it('exibe mensagem quando não há foto', () => {
