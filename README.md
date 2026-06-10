@@ -19,7 +19,7 @@ Aplicação web que entrega aos hóspedes um guia digital completo da propriedad
 | Camada | Tecnologia |
 |---|---|
 | Framework | Next.js 16 (App Router, Server Actions) |
-| Banco de dados | SQLite via Prisma 7 + `better-sqlite3` |
+| Banco de dados | PostgreSQL via Prisma 7 + `@prisma/adapter-pg` |
 | ORM | Prisma 7 com driver adapter |
 | IA | OpenAI `gpt-4o-mini` |
 | Validação | Zod 4 |
@@ -71,7 +71,7 @@ scripts/
 ### Fluxo de dados
 
 ```
-page.tsx → Server Action → Service → Repository → Prisma → SQLite
+page.tsx → Server Action → Service → Repository → Prisma → PostgreSQL
 ```
 
 ---
@@ -80,6 +80,7 @@ page.tsx → Server Action → Service → Repository → Prisma → SQLite
 
 - Node.js 20+
 - npm 10+
+- PostgreSQL 14+ (instância local ou remota)
 - Chave de API da OpenAI (opcional — o chat tem fallback sem IA)
 
 ---
@@ -97,7 +98,7 @@ npm install
 Crie um arquivo `.env` na raiz com:
 
 ```env
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="postgresql://user:password@localhost:5432/seazone?schema=public"
 OPENAI_API_KEY="sk-..."   # opcional
 ```
 
