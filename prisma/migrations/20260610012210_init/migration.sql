@@ -1,19 +1,21 @@
 -- CreateTable
 CREATE TABLE "Property" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "propertyType" TEXT NOT NULL,
     "bedroomQuantity" INTEGER NOT NULL,
     "bathroomQuantity" INTEGER NOT NULL,
     "guestCapacity" INTEGER NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Address" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "street" TEXT NOT NULL,
     "number" TEXT NOT NULL,
     "complement" TEXT,
@@ -22,12 +24,13 @@ CREATE TABLE "Address" (
     "state" TEXT NOT NULL,
     "postalCode" TEXT NOT NULL,
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "Address_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Operational" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "wifiNetwork" TEXT NOT NULL,
     "wifiPassword" TEXT NOT NULL,
     "isSelfCheckin" BOOLEAN NOT NULL,
@@ -38,12 +41,13 @@ CREATE TABLE "Operational" (
     "parkingSpotIdentifier" TEXT,
     "parkingSpotInstructions" TEXT,
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "Operational_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "Operational_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PropertyRules" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "checkInTime" TEXT NOT NULL,
     "checkOutTime" TEXT NOT NULL,
     "allowPet" BOOLEAN NOT NULL,
@@ -52,12 +56,13 @@ CREATE TABLE "PropertyRules" (
     "suitableForBabies" BOOLEAN NOT NULL,
     "eventsPermitted" BOOLEAN NOT NULL,
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "PropertyRules_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "PropertyRules_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Amenities" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "wifi" BOOLEAN NOT NULL DEFAULT false,
     "tv" BOOLEAN NOT NULL DEFAULT false,
     "airConditioning" BOOLEAN NOT NULL DEFAULT false,
@@ -70,47 +75,53 @@ CREATE TABLE "Amenities" (
     "jacuzzi" BOOLEAN NOT NULL DEFAULT false,
     "pool" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "Amenities_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "Amenities_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PropertyImage" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "alt" TEXT NOT NULL DEFAULT '',
     "order" INTEGER NOT NULL DEFAULT 0,
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "PropertyImage_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "PropertyImage_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Host" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "Host_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "Host_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "LocalGuide" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "welcomeMessage" TEXT NOT NULL,
     "seasonalTips" TEXT NOT NULL DEFAULT '',
+    "aiGeneratedAt" TIMESTAMP(3),
     "propertyId" TEXT NOT NULL,
-    CONSTRAINT "LocalGuide_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "LocalGuide_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "LocalGuidePlace" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "category" TEXT NOT NULL,
     "placeType" TEXT,
     "distance" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "guideId" TEXT NOT NULL,
-    CONSTRAINT "LocalGuidePlace_guideId_fkey" FOREIGN KEY ("guideId") REFERENCES "LocalGuide" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "LocalGuidePlace_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -133,3 +144,27 @@ CREATE UNIQUE INDEX "Host_propertyId_key" ON "Host"("propertyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "LocalGuide_propertyId_key" ON "LocalGuide"("propertyId");
+
+-- AddForeignKey
+ALTER TABLE "Address" ADD CONSTRAINT "Address_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Operational" ADD CONSTRAINT "Operational_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PropertyRules" ADD CONSTRAINT "PropertyRules_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Amenities" ADD CONSTRAINT "Amenities_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PropertyImage" ADD CONSTRAINT "PropertyImage_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Host" ADD CONSTRAINT "Host_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "LocalGuide" ADD CONSTRAINT "LocalGuide_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "LocalGuidePlace" ADD CONSTRAINT "LocalGuidePlace_guideId_fkey" FOREIGN KEY ("guideId") REFERENCES "LocalGuide"("id") ON DELETE CASCADE ON UPDATE CASCADE;
