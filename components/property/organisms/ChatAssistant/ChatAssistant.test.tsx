@@ -16,6 +16,14 @@ function createMockStream(text: string) {
   });
 }
 
+function createMockResponse(text: string, isFallback = false): Response {
+  return {
+    ok: true,
+    body: createMockStream(text),
+    headers: { get: (key: string) => (key === 'X-Is-Fallback' && isFallback ? 'true' : null) },
+  } as unknown as Response;
+}
+
 describe('ChatAssistant', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
@@ -56,10 +64,9 @@ describe('ChatAssistant', () => {
   });
 
   it('envia mensagem e exibe resposta em streaming', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      body: createMockStream('A rede é SeaHome_FLN001 e a senha é floripa2024.'),
-    } as Response);
+    vi.mocked(fetch).mockResolvedValue(
+      createMockResponse('A rede é SeaHome_FLN001 e a senha é floripa2024.'),
+    );
 
     render(<ChatAssistant code="FLN001" />);
     await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
@@ -76,10 +83,9 @@ describe('ChatAssistant', () => {
   });
 
   it('envia mensagem ao clicar em pergunta sugerida', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      body: createMockStream('Infelizmente este imóvel não permite animais de estimação.'),
-    } as Response);
+    vi.mocked(fetch).mockResolvedValue(
+      createMockResponse('Infelizmente este imóvel não permite animais de estimação.'),
+    );
 
     render(<ChatAssistant code="FLN001" />);
     await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
@@ -101,10 +107,7 @@ describe('ChatAssistant', () => {
   });
 
   it('chama a API com o código correto', async () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-      body: createMockStream('Resposta do assistente.'),
-    } as Response);
+    vi.mocked(fetch).mockResolvedValue(createMockResponse('Resposta do assistente.'));
 
     render(<ChatAssistant code="GRM001" />);
     await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
@@ -119,5 +122,62 @@ describe('ChatAssistant', () => {
         expect.objectContaining({ method: 'POST' }),
       );
     });
+  });
+
+  it('esconde sugestões após resposta normal da IA', async () => {
+    vi.mocked(fetch).mockResolvedValue(createMockResponse('O check-in é a partir das 15h.'));
+
+    render(<ChatAssistant code="FLN001" />);
+    await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+
+    expect(screen.getByText('Qual a senha do WiFi?')).toBeInTheDocument();
+
+    const input = screen.getByPlaceholderText(/Digite sua pergunta/i);
+    await userEvent.type(input, 'A que horas posso fazer check-in?');
+    await userEvent.click(screen.getByRole('button', { name: /Enviar mensagem/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/check-in é a partir das 15h/i)).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Qual a senha do WiFi?')).not.toBeInTheDocument();
+  });
+
+  it('exibe sugestões novamente quando recebe resposta de fallback do servidor', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      createMockResponse('Não tenho informações suficientes para responder a essa pergunta.', true),
+    );
+
+    render(<ChatAssistant code="FLN001" />);
+    await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+
+    const input = screen.getByPlaceholderText(/Digite sua pergunta/i);
+    await userEvent.type(input, 'Qual o código do cofre?');
+    await userEvent.click(screen.getByRole('button', { name: /Enviar mensagem/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Não tenho informações suficientes/i)).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Qual a senha do WiFi?')).toBeInTheDocument();
+    expect(screen.getByText('Posso trazer meu cachorro?')).toBeInTheDocument();
+  });
+
+  it('exibe sugestões novamente quando ocorre erro de rede', async () => {
+    vi.mocked(fetch).mockRejectedValue(new Error('Network error'));
+
+    render(<ChatAssistant code="FLN001" />);
+    await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+
+    const input = screen.getByPlaceholderText(/Digite sua pergunta/i);
+    await userEvent.type(input, 'Pergunta qualquer');
+    await userEvent.click(screen.getByRole('button', { name: /Enviar mensagem/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/ocorreu um erro/i)).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Qual a senha do WiFi?')).toBeInTheDocument();
+    expect(screen.getByText('Posso trazer meu cachorro?')).toBeInTheDocument();
   });
 });
