@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { MdWhatsapp } from 'react-icons/md';
-import { Logo } from '@/components/shared/atoms';
+import { Button, Logo } from '@/components/shared/atoms';
 
 interface AppHeaderProps {
   propertyCode?: string;
@@ -23,16 +23,17 @@ export function AppHeader({ propertyCode }: AppHeaderProps) {
           )}
         </Link>
 
-        <a
+        <Button
           href="https://wa.me/5548988620024"
+          variant="primary"
+          size="sm"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-sm font-semibold text-primary border border-primary/40 bg-primary-light hover:bg-primary hover:text-white transition-colors px-3 py-1.5 rounded-full"
           aria-label="Atendimento via WhatsApp"
         >
           <MdWhatsapp size={17} />
-          <span>Atendimento</span>
-        </a>
+          Atendimento
+        </Button>
       </div>
     </header>
   );

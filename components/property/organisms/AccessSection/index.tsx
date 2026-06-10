@@ -1,3 +1,4 @@
+import { MdVpnKey } from 'react-icons/md';
 import { SectionTitle } from '@/components/shared/molecules/SectionTitle';
 import { WifiCard } from '@/components/property/molecules/WifiCard';
 import { AccessCard } from '@/components/property/molecules/AccessCard';
@@ -24,6 +25,7 @@ export function AccessSection({ wifi, access, parking }: AccessSectionProps) {
   return (
     <section aria-label="Informações de acesso">
       <SectionTitle
+        icon={<MdVpnKey size={22} aria-hidden />}
         title="Acesso ao Imóvel"
         subtitle="Tudo que você precisa para entrar e se conectar"
         className="mb-4"

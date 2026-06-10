@@ -3,7 +3,6 @@
 :root {
   /* Surfaces */
   --background: #f8fafc;
-  --foreground: #0f172a;
   --surface: #ffffff;
   --surface-secondary: #f1f5f9;
 
@@ -12,6 +11,14 @@
   --primary-hover: #0052a3;
   --primary-light: #e8f2ff;
   --primary-foreground: #ffffff;
+
+  /* Brand — Seazone Coral (CTAs) */
+  --primary-action: #fc6058;
+  --primary-action-hover: #e85550;
+  --primary-action-light: #fff0ef;
+
+  /* Brand — Seazone Navy */
+  --brand-navy: #00143d;
 
   /* Accent — Teal */
   --accent: #0ea5a0;
@@ -25,7 +32,6 @@
 
   /* Border */
   --border: #e2e8f0;
-  --border-strong: #cbd5e1;
 
   /* Semantic */
   --success: #16a34a;
@@ -53,13 +59,16 @@
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-secondary: var(--surface-secondary);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-light: var(--primary-light);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-action: var(--primary-action);
+  --color-primary-action-hover: var(--primary-action-hover);
+  --color-primary-action-light: var(--primary-action-light);
+  --color-brand-navy: var(--brand-navy);
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
   --color-text-heading: var(--text-heading);
@@ -67,7 +76,6 @@
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
   --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
   --color-success: var(--success);
   --color-success-light: var(--success-light);
   --color-danger: var(--danger);

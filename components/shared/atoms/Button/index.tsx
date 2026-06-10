@@ -24,15 +24,15 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm active:scale-[0.98]',
+    'bg-primary-action text-white font-semibold rounded-full hover:bg-primary-action-hover focus-visible:ring-primary-action active:scale-[0.98]',
   secondary:
-    'bg-surface text-primary border border-primary hover:bg-primary-light active:scale-[0.98]',
+    'bg-primary text-primary-foreground font-semibold rounded-full hover:bg-primary-hover focus-visible:ring-primary active:scale-[0.98]',
   ghost:
-    'bg-transparent text-text-body hover:bg-surface-secondary active:scale-[0.98]',
+    'bg-transparent text-text-body rounded-[--radius-md] hover:bg-surface-secondary focus-visible:ring-primary active:scale-[0.98]',
   danger:
-    'bg-danger text-white hover:bg-red-700 shadow-sm active:scale-[0.98]',
+    'bg-danger text-white rounded-[--radius-md] hover:bg-red-700 shadow-sm focus-visible:ring-danger active:scale-[0.98]',
   whatsapp:
-    'bg-whatsapp text-white hover:bg-whatsapp-hover shadow-sm active:scale-[0.98]',
+    'bg-whatsapp text-white rounded-[--radius-md] hover:bg-whatsapp-hover shadow-sm focus-visible:ring-whatsapp active:scale-[0.98]',
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -48,8 +48,8 @@ function getButtonClasses({
   className = '',
 }: ButtonStyleProps) {
   return [
-    'inline-flex items-center justify-center font-medium rounded-[--radius-md] transition-all duration-150 cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+    'inline-flex items-center justify-center font-medium transition-all duration-150 cursor-pointer',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100',
     variantClasses[variant],
     sizeClasses[size],

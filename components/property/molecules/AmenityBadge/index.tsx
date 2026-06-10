@@ -9,13 +9,9 @@ interface AmenityBadgeProps {
 export function AmenityBadge({ amenity, className = '' }: AmenityBadgeProps) {
   return (
     <Badge
-      icon={<AmenityIcon amenity={amenity} size={18} />}
-      className={[
-        'rounded-[--radius-md] shadow-sm px-3 py-2 text-sm',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      variant="tag"
+      icon={<AmenityIcon amenity={amenity} size={16} />}
+      className={className}
     >
       {amenityLabelMap[amenity]}
     </Badge>

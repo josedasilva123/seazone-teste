@@ -6,5 +6,6 @@ export { AccessCard, getAccessType } from './AccessCard';
 export { RuleItem } from './RuleItem';
 export type { PolicyKey } from './RuleItem';
 export { HostCard } from './HostCard';
+export { CheckInOutCard } from './CheckInOutCard';
 export { CheckInOutStrip } from './CheckInOutStrip';
 export { PlaceCard } from './PlaceCard';

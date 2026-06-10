@@ -20,10 +20,20 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  it('aplica variante secondary corretamente', () => {
+  it('aplica variante primary com estilo coral pill', () => {
+    render(<Button variant="primary">Confirmar</Button>);
+    const btn = screen.getByRole('button');
+    expect(btn).toHaveClass('bg-primary-action');
+    expect(btn).toHaveClass('rounded-full');
+    expect(btn).toHaveClass('font-semibold');
+  });
+
+  it('aplica variante secondary com azul sólido pill', () => {
     render(<Button variant="secondary">Secundário</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('border-primary');
+    expect(btn).toHaveClass('bg-primary');
+    expect(btn).toHaveClass('rounded-full');
+    expect(btn).toHaveClass('font-semibold');
   });
 
   it('aplica fullWidth corretamente', () => {
