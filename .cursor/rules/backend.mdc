@@ -1,0 +1,121 @@
+---
+description: Arquitetura da camada de back-end — Server Actions, Services, Repositories, Prisma
+alwaysApply: true
+---
+
+# Camada de Back-end (Server Actions + Prisma 7)
+
+Stack: **Next.js 16 App Router · Server Actions · Prisma 7 · Zod · PostgreSQL**
+
+## Estrutura de pastas
+
+```
+lib/
+  db/
+    index.ts              # Prisma client singleton — importar como `db`
+  actions/
+    types.ts              # ActionResult<T> compartilhado
+    [domain]/
+      *.ts                # Server Actions do domínio
+  services/
+    [domain]/
+      *.ts                # Lógica de negócio
+  repositories/
+    [domain]/
+      *.ts                # Acesso ao banco (Prisma)
+  validations/
+    [domain]/
+      *.ts                # Schemas Zod
+  generated/
+    prisma/               # Gerado por `prisma generate` — não editar
+prisma/
+  schema.prisma
+  migrations/
+prisma.config.ts          # Configuração do Prisma 7 (datasource URL via env)
+```
+
+## Fluxo obrigatório
+
+```
+page.tsx  →  Server Action  →  Service  →  Repository  →  db (Prisma)  →  DB
+```
+
+Cada camada só conversa com a camada imediatamente abaixo.
+
+## Next.js 16 — pontos críticos
+
+- Request APIs são **totalmente async**: sempre `await cookies()`, `await headers()`, `await params`.
+- Cache explícito via `'use cache'` — não há fetch caching implícito.
+- `middleware.ts` foi renomeado para `proxy.ts` (runtime Node.js, não Edge).
+
+## Server Actions (`lib/actions/[domain]/`)
+
+```ts
+"use server";
+
+import { mySchema } from "@/lib/validations/[domain]";
+import { MyService } from "@/lib/services/[domain]";
+import type { ActionResult } from "@/lib/actions/types";
+
+export async function createSomething(
+  formData: FormData
+): Promise<ActionResult<{ id: string }>> {
+  const parsed = mySchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { ok: false, error: parsed.error.flatten() };
+
+  const result = await MyService.create(parsed.data);
+  return { ok: true, data: { id: result.id } };
+}
+```
+
+- **Sempre** validar input com Zod antes de chamar o Service.
+- **Sempre** retornar `ActionResult<T>` (nunca throw direto ao cliente).
+
+## Services (`lib/services/[domain]/`)
+
+- Contêm lógica de negócio pura.
+- Não importam `db` diretamente — chamam o Repository.
+- Podem lançar erros tipados; o Action os captura.
+
+## Repositories (`lib/repositories/[domain]/`)
+
+- Única camada que importa `db` de `@/lib/db`.
+- Expõem métodos semânticos: `findById`, `create`, `update`, `delete`, `list`.
+- Nunca expõem queries Prisma raw ao Service.
+
+## Validations (`lib/validations/[domain]/`)
+
+- Schemas Zod reutilizáveis entre Action e qualquer outro ponto de entrada.
+
+## Prisma Client
+
+Prisma 7 exige um **driver adapter** — não instancie `PrismaClient` sem um.
+
+```ts
+// lib/db/index.ts — singleton com adapter SQLite (trocar pelo adapter correto em prod)
+import 'dotenv/config';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaClient } from '../generated/prisma/client';
+
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+
+function createPrismaClient() {
+  const url = process.env.DATABASE_URL ?? 'file:./prisma/dev.db';
+  const adapter = new PrismaBetterSqlite3({ url });
+  return new PrismaClient({ adapter });
+}
+
+export const db = globalForPrisma.prisma ?? createPrismaClient();
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
+```
+
+Importar sempre como: `import { db } from '@/lib/db'`
+
+## Comandos Prisma
+
+```bash
+npx prisma generate          # Regerar client após mudar schema
+npx prisma migrate dev       # Criar e aplicar migração em dev
+npx prisma migrate deploy    # Aplicar migrações em produção
+npx prisma studio            # GUI visual do banco
+```

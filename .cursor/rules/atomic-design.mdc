@@ -1,0 +1,69 @@
+---
+description: Atomic Design com domínios — estrutura e convenções de componentes
+alwaysApply: true
+---
+
+# Atomic Design + Domain-Driven Components
+
+Todo componente de UI deve seguir a hierarquia do Atomic Design dentro de `components/`. O alias `@/` aponta para a raiz do projeto.
+
+## Estrutura de pastas
+
+```
+components/
+  shared/               # Componentes reutilizáveis entre qualquer domínio
+    atoms/              # Elementos indivisíveis: Button, Input, Label, Icon, Badge
+    molecules/          # Grupos de átomos: FormField, SearchBar, Card
+    organisms/          # Seções complexas: Header, Footer, Modal, Sidebar
+    templates/          # Layouts sem dados reais: DashboardTemplate, AuthTemplate
+  [domain]/             # Ex: booking, property, user, auth…
+    atoms/
+    molecules/
+    organisms/
+    templates/
+app/
+  [domain]/
+    page.tsx            # Instancia templates do domínio com dados reais
+```
+
+## Quando usar `shared` vs domínio
+
+| Situação | Onde colocar |
+|---|---|
+| Componente usado em 2+ domínios | `components/shared/` |
+| Componente exclusivo de um domínio | `components/[domain]/` |
+| Dúvida — começar localizado; mover ao reutilizar | `components/[domain]/` → `shared/` |
+
+## Regras de dependência
+
+- **Átomos** não importam outros componentes de `components/`.
+- **Moléculas** importam apenas átomos (do mesmo escopo ou de `shared`).
+- **Organismos** importam átomos e/ou moléculas (do mesmo escopo ou de `shared`).
+- **Templates** importam organismos, moléculas e átomos — sem dados fixos; recebem dados via `children` ou props.
+- **Pages** (`app/**/page.tsx`) buscam dados e passam para templates/organismos.
+- Componentes de `[domain]/` **não** importam de outros domínios — somente de `shared/`.
+
+## Estrutura interna de cada componente
+
+```
+components/shared/atoms/Button/
+  index.tsx
+  Button.test.tsx
+```
+
+## Barrel exports por camada
+
+```ts
+// components/shared/atoms/index.ts
+export { Button } from './Button';
+export { Input } from './Input';
+
+// components/booking/molecules/index.ts
+export { BookingCard } from './BookingCard';
+```
+
+```ts
+// Em qualquer lugar
+import { Button } from '@/components/shared/atoms';
+import { BookingCard } from '@/components/booking/molecules';
+```

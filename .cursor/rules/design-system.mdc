@@ -1,0 +1,81 @@
+---
+description: Design system do Guia Digital Seazone — tokens CSS, catálogo de componentes e padrões de uso
+alwaysApply: true
+---
+
+# Design System — Seazone Guia Digital
+
+## Tokens de design (`globals.css`)
+
+Use **sempre variáveis CSS** — nunca valores hardcoded (ex: `#0066cc`).
+
+| Token | Uso |
+|---|---|
+| `text-primary` | Cor de marca (azul oceano) — CTAs, ícones de destaque |
+| `text-text-heading` | Títulos e headings |
+| `text-text-body` | Corpo de texto padrão |
+| `text-text-muted` | Labels, placeholders, metadados |
+| `bg-surface` | Cards, modais (branco) |
+| `bg-surface-secondary` | Fundo de inputs, badges neutros |
+| `bg-background` | Fundo de página |
+| `bg-primary-light` | Destaque suave de marca |
+| `bg-success-light` / `text-success` | Políticas permitidas |
+| `bg-danger-light` / `text-danger` | Políticas proibidas |
+| `border-border` | Bordas padrão |
+| `rounded-[--radius-md]` / `rounded-[--radius-lg]` | Border-radius de cards e botões |
+| `shadow-sm` / `shadow-md` | Elevação de cards |
+
+## Catálogo de componentes
+
+### Shared — importar de `@/components/shared/{camada}`
+
+```ts
+import { Button, Badge, Divider } from '@/components/shared/atoms';
+import { InfoCard, SectionTitle } from '@/components/shared/molecules';
+import { AppHeader } from '@/components/shared/organisms';
+```
+
+**Button** — `variant`: `primary | secondary | ghost | danger` · `size`: `sm | md | lg` · `fullWidth`
+**Badge** — `variant`: `default | primary | success | danger | warning | accent` · `size`: `sm | md` · `icon`
+**InfoCard** — `icon`, `label`, `value`, `subvalue?`, `variant`: `default | highlight`
+**SectionTitle** — `title`, `subtitle?`, `align`: `left | center`
+
+### Property domain — importar de `@/components/property/{camada}`
+
+```ts
+import { AmenityIcon, RuleStatus } from '@/components/property/atoms';
+import { PropertyMeta, AmenityBadge, WifiCard, AccessCard, RuleItem, HostCard } from '@/components/property/molecules';
+import { PropertyHero, AmenitiesSection, AccessSection, StayRulesSection, HostSection } from '@/components/property/organisms';
+import { PropertyGuideTemplate } from '@/components/property/templates';
+```
+
+**AmenityKey** (tipo): `wifi | tv | airConditioning | kitchen | washingMachine | elevator | balcony | bbqGrill | dishwasher | jacuzzi | pool`
+**AccessCard** `type`: `smart_lock | key_safe | physical_key | other`
+**RuleItem** `policy`: `pet | smoking | children | babies | events`
+
+## Padrões obrigatórios
+
+```tsx
+// ✅ BOM — tokens semânticos + importação por barrel
+import { Button } from '@/components/shared/atoms';
+<Button variant="secondary" size="sm">Ver mais</Button>
+
+// ❌ RUIM — cor hardcoded e import direto do arquivo
+<button style={{ background: '#0066cc' }}>Ver mais</button>
+import { Button } from '@/components/shared/atoms/Button/index';
+```
+
+```tsx
+// ✅ BOM — componente de domínio não importa de outro domínio
+import { SectionTitle } from '@/components/shared/molecules'; // ← shared, OK
+
+// ❌ RUIM — cross-domain import
+import { BookingCard } from '@/components/booking/molecules'; // dentro de property/
+```
+
+## Adicionando novos componentes
+
+1. Crie na pasta correta seguindo Atomic Design (`shared/` se usado em 2+ domínios).
+2. Estrutura: pasta com `index.tsx` + `ComponentName.test.tsx`.
+3. Exporte no barrel `index.ts` da camada correspondente.
+4. Use apenas tokens de `globals.css` — sem valores fixos de cor ou espaçamento.

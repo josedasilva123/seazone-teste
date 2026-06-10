@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── Property ────────────────────────────────────────────────────────────────
+
+model Property {
+  id               String          @id @default(cuid())
+  code             String          @unique
+  name             String
+  propertyType     String
+  bedroomQuantity  Int
+  bathroomQuantity Int
+  guestCapacity    Int
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  address     Address?
+  operational Operational?
+  rules       PropertyRules?
+  amenities   Amenities?
+  images      PropertyImage[]
+  host        Host?
+  localGuide  LocalGuide?
+}
+
+// ─── Address ─────────────────────────────────────────────────────────────────
+
+model Address {
+  id           String   @id @default(cuid())
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  postalCode   String
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String   @unique
+}
+
+// ─── Operational ─────────────────────────────────────────────────────────────
+
+model Operational {
+  id                         String  @id @default(cuid())
+  wifiNetwork                String
+  wifiPassword               String
+  isSelfCheckin              Boolean
+  propertyAccessType         String
+  propertyAccessInstructions String
+  propertyPassword           String
+  hasParkingSpot             Boolean
+  parkingSpotIdentifier      String?
+  parkingSpotInstructions    String?
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String   @unique
+}
+
+// ─── Rules ───────────────────────────────────────────────────────────────────
+
+model PropertyRules {
+  id                  String  @id @default(cuid())
+  checkInTime         String
+  checkOutTime        String
+  allowPet            Boolean
+  smokingPermitted    Boolean
+  suitableForChildren Boolean
+  suitableForBabies   Boolean
+  eventsPermitted     Boolean
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String   @unique
+}
+
+// ─── Amenities ───────────────────────────────────────────────────────────────
+
+model Amenities {
+  id             String  @id @default(cuid())
+  wifi           Boolean @default(false)
+  tv             Boolean @default(false)
+  airConditioning Boolean @default(false)
+  kitchen        Boolean @default(false)
+  washingMachine Boolean @default(false)
+  elevator       Boolean @default(false)
+  balcony        Boolean @default(false)
+  bbqGrill       Boolean @default(false)
+  dishwasher     Boolean @default(false)
+  jacuzzi        Boolean @default(false)
+  pool           Boolean @default(false)
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String   @unique
+}
+
+// ─── Images ──────────────────────────────────────────────────────────────────
+
+model PropertyImage {
+  id         String @id @default(cuid())
+  url        String
+  alt        String @default("")
+  order      Int    @default(0)
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+}
+
+// ─── Host ────────────────────────────────────────────────────────────────────
+
+model Host {
+  id    String @id @default(cuid())
+  name  String
+  phone String
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String   @unique
+}
+
+// ─── Local Guide ─────────────────────────────────────────────────────────────
+
+model LocalGuide {
+  id             String    @id @default(cuid())
+  welcomeMessage String
+  seasonalTips   String    @default("")
+  aiGeneratedAt  DateTime?
+
+  property   Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String           @unique
+  places     LocalGuidePlace[]
+}
+
+model LocalGuidePlace {
+  id          String  @id @default(cuid())
+  name        String
+  category    String  // "restaurant" | "attraction" | "essential"
+  placeType   String? // ex: "pharmacy" para essentials
+  distance    String
+  description String
+
+  guide   LocalGuide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  guideId String
+}
