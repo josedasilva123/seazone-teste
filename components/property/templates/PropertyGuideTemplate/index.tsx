@@ -108,7 +108,7 @@ export function PropertyGuideTemplate({
       <ChatAssistant code={code} />
 
       <footer className="w-full border-t border-border bg-surface mt-4">
-        <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col items-center gap-2 text-center">
+        <div className="max-w-2xl mx-auto px-4 pt-8 pb-24 sm:pb-8 flex flex-col items-center gap-2 text-center">
           <span className="text-lg font-bold text-primary tracking-tight">seazone</span>
           <p className="text-xs text-text-muted">
             Gestão inteligente de imóveis por temporada
