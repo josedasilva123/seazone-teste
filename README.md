@@ -8,7 +8,7 @@ Aplicação web que entrega aos hóspedes um guia digital completo da propriedad
 
 - **Listagem de imóveis** com paginação e filtros
 - **Guia do hóspede** por código de imóvel: WiFi, check-in/out, comodidades, regras, acesso e anfitrião
-- **Guia local com IA** gerado sob demanda via OpenAI (restaurantes, atrações, serviços essenciais)
+- **Guia local com IA** gerado sob demanda via Google Gemini (restaurantes, atrações, serviços essenciais)
 - **Chat assistente** com streaming de respostas e fallback baseado em regras quando a cota da API está esgotada
 - **Metadados dinâmicos** (Open Graph / SEO) por imóvel
 
@@ -21,7 +21,7 @@ Aplicação web que entrega aos hóspedes um guia digital completo da propriedad
 | Framework | Next.js 16 (App Router, Server Actions) |
 | Banco de dados | PostgreSQL via Prisma 7 + `@prisma/adapter-pg` |
 | ORM | Prisma 7 com driver adapter |
-| IA | OpenAI `gpt-4o-mini` |
+| IA | Google Gemini `gemini-2.0-flash` |
 | Validação | Zod 4 |
 | UI | React 19 + Tailwind CSS 4 |
 | Ícones | react-icons |
@@ -81,7 +81,7 @@ page.tsx → Server Action → Service → Repository → Prisma → PostgreSQL
 - Node.js 20+
 - npm 10+
 - PostgreSQL 14+ (instância local ou remota)
-- Chave de API da OpenAI (opcional — o chat tem fallback sem IA)
+- Chave de API do Google Gemini (opcional — o chat tem fallback sem IA)
 
 ---
 
@@ -99,7 +99,8 @@ Crie um arquivo `.env` na raiz com:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/seazone?schema=public"
-OPENAI_API_KEY="sk-..."   # opcional
+GEMINI_API_KEY="AIza..."   # opcional — obtenha em https://aistudio.google.com/apikey
+GEMINI_MODEL="gemini-2.0-flash"   # opcional — padrão: gemini-2.0-flash
 ```
 
 ### 3. Banco de dados
@@ -131,6 +132,18 @@ Acesse [http://localhost:3000](http://localhost:3000).
 |---|---|
 | `FLN001` | Apartamento Beira-Mar — Florianópolis, SC |
 | `GRM001` | Chalé Serra — Gramado, RS |
+| `RIO001` | Cobertura Vista Mar — Rio de Janeiro, RJ |
+| `SP001` | Loft Design — São Paulo, SP |
+| `BUZ001` | Casa de Praia Geribá — Búzios, RJ |
+| `POA001` | Apartamento Moinhos de Vento — Porto Alegre, RS |
+| `CWB001` | Studio Batel — Curitiba, PR |
+| `SSA001` | Flat Barra — Salvador, BA |
+| `REC001` | Casa Boa Viagem — Recife, PE |
+| `BSB001` | Apartamento Asa Sul — Brasília, DF |
+| `MCZ001` | Bangalô Ponta Verde — Maceió, AL |
+| `PAR001` | Pousada Centro Histórico — Paraty, RJ |
+| `UBA001` | Casa Praia Grande — Ubatuba, SP |
+| `CNT001` | Chalé — Campos do Jordão, SP |
 
 Acesse o guia de um imóvel em `/[CODIGO]`, por exemplo: [http://localhost:3000/FLN001](http://localhost:3000/FLN001).
 

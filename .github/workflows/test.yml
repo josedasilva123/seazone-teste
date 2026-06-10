@@ -14,7 +14,7 @@ jobs:
       # Todos os testes mockam @/lib/db — nenhuma conexão real é feita.
       # DATABASE_URL precisa existir para o prisma generate (via postinstall).
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
-      OPENAI_API_KEY: "sk-test-placeholder"
+      GEMINI_API_KEY: "test-placeholder"
 
     steps:
       - name: Checkout do código

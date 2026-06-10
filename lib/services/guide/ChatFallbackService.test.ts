@@ -139,8 +139,12 @@ describe('ChatFallbackService.isQuotaError', () => {
     expect(ChatFallbackService.isQuotaError(new Error('429 quota exceeded'))).toBe(true);
   });
 
-  it('detecta erro de insufficient_quota', () => {
+  it('detecta erro de quota excedida', () => {
     expect(ChatFallbackService.isQuotaError(new Error('insufficient_quota'))).toBe(true);
+  });
+
+  it('detecta RESOURCE_EXHAUSTED do Gemini', () => {
+    expect(ChatFallbackService.isQuotaError(new Error('[GoogleGenerativeAI Error]: RESOURCE_EXHAUSTED'))).toBe(true);
   });
 
   it('detecta rate limit', () => {
