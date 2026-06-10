@@ -6,6 +6,7 @@ import { StayRulesSection } from '@/components/property/organisms/StayRulesSecti
 import { HostSection } from '@/components/property/organisms/HostSection';
 import { ExperienceGuideSection } from '@/components/property/organisms/ExperienceGuideSection';
 import { ChatAssistant } from '@/components/property/organisms/ChatAssistant';
+import { Logo } from '@/components/shared/atoms';
 import { CheckInOutStrip } from '@/components/property/molecules/CheckInOutStrip';
 import type { AmenityKey } from '@/components/property/atoms/AmenityIcon';
 
@@ -109,7 +110,7 @@ export function PropertyGuideTemplate({
 
       <footer className="w-full border-t border-border bg-surface mt-4">
         <div className="max-w-2xl mx-auto px-4 pt-8 pb-24 sm:pb-8 flex flex-col items-center gap-2 text-center">
-          <span className="text-lg font-bold text-primary tracking-tight">seazone</span>
+          <Logo size="lg" />
           <p className="text-xs text-text-muted">
             Gestão inteligente de imóveis por temporada
           </p>

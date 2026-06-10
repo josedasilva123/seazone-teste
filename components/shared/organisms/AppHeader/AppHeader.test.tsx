@@ -10,7 +10,7 @@ vi.mock('next/link', () => ({
 describe('AppHeader', () => {
   it('renderiza o logo Seazone', () => {
     render(<AppHeader />);
-    expect(screen.getByText('seazone')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Seazone' })).toBeInTheDocument();
   });
 
   it('renderiza o código da propriedade quando fornecido', () => {
