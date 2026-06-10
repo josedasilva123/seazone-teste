@@ -118,6 +118,14 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
         });
       }
 
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === 'assistant' && !last.content.trim()) {
+          setIsStreaming(false);
+        }
+        return prev;
+      });
+
       if (isFallback) setShowSuggestions(true);
     } catch (err) {
       if ((err as Error).name === 'AbortError') {
