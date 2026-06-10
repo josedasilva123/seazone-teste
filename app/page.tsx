@@ -1,3 +1,4 @@
+import { Logo } from '@/components/shared/atoms';
 import { AppHeader } from '@/components/shared/organisms/AppHeader';
 import { PropertyList } from '@/components/property/organisms/PropertyList';
 import { listProperties } from '@/lib/actions/property';
@@ -43,7 +44,7 @@ export default async function HomePage() {
 
       <footer className="w-full border-t border-border bg-surface">
         <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="text-sm font-bold text-primary">seazone</span>
+          <Logo size="sm" />
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} Seazone Serviços Ltda. — Gestão inteligente de imóveis por temporada
           </p>

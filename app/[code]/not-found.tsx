@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { AppHeader } from '@/components/shared/organisms/AppHeader';
-import { Button } from '@/components/shared/atoms';
+import { Button, Logo } from '@/components/shared/atoms';
 
 export default function PropertyNotFound() {
   return (
@@ -27,7 +27,7 @@ export default function PropertyNotFound() {
 
       <footer className="w-full border-t border-border bg-surface">
         <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col items-center gap-1 text-center">
-          <span className="text-sm font-bold text-primary">seazone</span>
+          <Logo size="sm" />
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} Seazone Serviços Ltda.
           </p>
