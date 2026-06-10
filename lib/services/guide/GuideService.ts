@@ -72,18 +72,27 @@ export const GuideService = {
     const now = new Date();
     const prompt = buildGuidePrompt(property.name, property.address, now.getMonth() + 1);
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: GUIDE_SYSTEM_PROMPT },
-        { role: 'user', content: prompt },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
-    });
+    let generated: RawGuide;
+    try {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: GUIDE_SYSTEM_PROMPT },
+          { role: 'user', content: prompt },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+      });
 
-    const raw = completion.choices[0]?.message?.content ?? '{}';
-    const generated = JSON.parse(raw) as RawGuide;
+      const raw = completion.choices[0]?.message?.content ?? '{}';
+      generated = JSON.parse(raw) as RawGuide;
+    } catch (aiError) {
+      // Se a IA falhar (quota, rede, etc.) e já existir guia com dados, retorna-o como fallback
+      if (guide && guide.places.length > 0) {
+        return guide;
+      }
+      throw aiError;
+    }
 
     const places = [
       ...(generated.restaurants ?? []).map((r) => ({

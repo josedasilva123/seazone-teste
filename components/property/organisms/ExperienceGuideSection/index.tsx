@@ -79,29 +79,30 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
       setError(null);
 
       try {
-        const checkRes = await fetch(`/api/${code}/guide`, { method: 'GET' });
-        const checkData = await checkRes.json() as { ok: boolean; data?: Guide; error?: string };
+        const res = await fetch(`/api/${code}/guide`, { method: 'GET' });
+        const data = await res.json() as { ok: boolean; data?: Guide; error?: string };
 
         if (cancelled) return;
 
-        if (!checkData.ok) {
-          setError(checkData.error ?? 'Erro ao carregar guia');
+        if (!data.ok || !data.data) {
+          setError(data.error ?? 'Erro ao carregar guia');
           return;
         }
 
-        if (!checkData.data?.aiGeneratedAt) {
+        // Se o guia ainda não foi gerado pela IA, mostra indicador e aguarda
+        if (!data.data.aiGeneratedAt) {
           setGenerating(true);
           const genRes = await fetch(`/api/${code}/guide`, { method: 'GET' });
           const genData = await genRes.json() as { ok: boolean; data?: Guide; error?: string };
           if (cancelled) return;
+          setGenerating(false);
           if (genData.ok && genData.data) {
             setGuide(genData.data);
           } else {
             setError(genData.error ?? 'Erro ao gerar guia');
           }
-          setGenerating(false);
         } else {
-          setGuide(checkData.data);
+          setGuide(data.data);
         }
       } catch {
         if (!cancelled) setError('Não foi possível carregar o guia. Tente novamente.');

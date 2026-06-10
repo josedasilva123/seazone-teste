@@ -100,6 +100,7 @@ async function main() {
 
       localGuide: {
         create: {
+          aiGeneratedAt: new Date(),
           welcomeMessage:
             'Seu apartamento fica no coração da Trindade, a poucos minutos das principais atrações da ilha. Aproveite a vista privilegiada e a localização central para explorar Florianópolis!',
           seasonalTips:
@@ -238,6 +239,7 @@ async function main() {
 
       localGuide: {
         create: {
+          aiGeneratedAt: new Date(),
           welcomeMessage:
             'Bem-vindo ao Chalé Serra Gramado! Você está em um dos destinos mais encantadores do Brasil. Explore a gastronomia italiana, os chocolates artesanais e as paisagens de tirar o fôlego.',
           seasonalTips:
