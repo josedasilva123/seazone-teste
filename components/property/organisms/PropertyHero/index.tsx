@@ -1,14 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  MdChevronLeft,
-  MdChevronRight,
-  MdLocationOn,
-  MdBed,
-  MdBathtub,
-  MdPeople,
-} from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdLocationOn } from 'react-icons/md';
+import { Button } from '@/components/shared/atoms';
+import { PropertyMeta } from '@/components/property/molecules/PropertyMeta';
 
 interface PropertyImage {
   url: string;
@@ -29,7 +24,7 @@ interface PropertyHeroProps {
 
 export function PropertyHero({
   name,
-  propertyType,
+  propertyType: _propertyType,
   city,
   state,
   bedrooms,
@@ -63,18 +58,6 @@ export function PropertyHero({
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/25" />
 
-      <div className="absolute top-3 left-4 z-10">
-        <span className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-primary text-white shadow">
-          {propertyType}
-        </span>
-      </div>
-
-      {total > 1 && (
-        <span className="absolute top-3 right-4 z-10 text-xs text-white bg-black/50 rounded-full px-2.5 py-1 backdrop-blur-sm">
-          {currentIndex + 1} / {total}
-        </span>
-      )}
-
       {/* Carrossel: sempre 16/9, máx 800px */}
       <div className="relative z-10 flex justify-center px-4 pt-10 pb-2">
         <div className="relative w-full max-w-[800px] aspect-video rounded-[--radius-xl] overflow-hidden shadow-2xl ring-1 ring-white/15">
@@ -92,30 +75,36 @@ export function PropertyHero({
 
           {total > 1 && (
             <>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={prev}
                 aria-label="Foto anterior"
-                className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-black/45 text-white hover:bg-black/65 transition-colors cursor-pointer"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 p-0 rounded-full bg-black/45 text-white hover:bg-black/65 hover:text-white"
               >
                 <MdChevronLeft size={20} />
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={next}
                 aria-label="Próxima foto"
-                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-black/45 text-white hover:bg-black/65 transition-colors cursor-pointer"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 p-0 rounded-full bg-black/45 text-white hover:bg-black/65 hover:text-white"
               >
                 <MdChevronRight size={20} />
-              </button>
+              </Button>
 
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
                 {sorted.map((_, i) => (
-                  <button
+                  <Button
                     key={i}
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setCurrentIndex(i)}
                     aria-label={`Foto ${i + 1}`}
                     className={[
-                      'w-1.5 h-1.5 rounded-full transition-all cursor-pointer',
-                      i === currentIndex ? 'bg-white scale-125' : 'bg-white/50',
+                      'w-1.5 h-1.5 min-w-0 p-0 rounded-full transition-all',
+                      i === currentIndex ? 'bg-white scale-125 hover:bg-white' : 'bg-white/50 hover:bg-white/50',
                     ].join(' ')}
                   />
                 ))}
@@ -131,20 +120,13 @@ export function PropertyHero({
           <MdLocationOn size={12} className="shrink-0" />
           <span>{city}, {state}</span>
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-0 text-[11px] text-white/65">
-          <span className="flex items-center gap-1">
-            <MdBed size={12} />
-            {bedrooms} quarto{bedrooms !== 1 ? 's' : ''}
-          </span>
-          <span className="flex items-center gap-1">
-            <MdBathtub size={12} />
-            {bathrooms} banheiro{bathrooms !== 1 ? 's' : ''}
-          </span>
-          <span className="flex items-center gap-1">
-            <MdPeople size={12} />
-            até {maxGuests} hóspede{maxGuests !== 1 ? 's' : ''}
-          </span>
-        </div>
+        <PropertyMeta
+          bedrooms={bedrooms}
+          bathrooms={bathrooms}
+          maxGuests={maxGuests}
+          tone="inverse"
+          size="sm"
+        />
       </div>
     </div>
   );

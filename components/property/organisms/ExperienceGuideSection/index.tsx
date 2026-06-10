@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MdRestaurant, MdAttractions, MdLocalPharmacy, MdShoppingCart, MdLocalHospital, MdLocationOn, MdAutoAwesome, MdWbSunny } from 'react-icons/md';
+import { MdRestaurant, MdAttractions, MdLocalPharmacy, MdShoppingCart, MdLocalHospital, MdAutoAwesome, MdWbSunny } from 'react-icons/md';
+import { Card } from '@/components/shared/atoms';
 import { SectionTitle } from '@/components/shared/molecules';
+import { PlaceCard } from '@/components/property/molecules/PlaceCard';
 
 interface Place {
   id: string;
@@ -130,34 +132,32 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
       {generating && <GeneratingState />}
 
       {error && (
-        <div className="flex items-center gap-3 p-4 rounded-[--radius-md] bg-danger-light border border-danger/20">
+        <Card variant="danger">
           <span className="text-sm text-danger">{error}</span>
-        </div>
+        </Card>
       )}
 
       {guide && !loading && (
         <div className="space-y-6 mt-4">
-          {/* Welcome message */}
-          <div className="p-4 rounded-[--radius-lg] bg-primary-light border border-primary/15">
+          <Card variant="highlight">
             <div className="flex items-start gap-3">
-              <div className="shrink-0 mt-0.5">
-                <MdAutoAwesome size={18} className="text-primary" />
-              </div>
+              <MdAutoAwesome size={18} className="text-primary shrink-0 mt-0.5" />
               <p className="text-sm text-text-body leading-relaxed">{guide.welcomeMessage}</p>
             </div>
-          </div>
+          </Card>
 
-          {/* Seasonal tip */}
           {guide.seasonalTips && (
-            <div className="p-4 rounded-[--radius-lg] bg-warning-light border border-warning/20">
+            <Card variant="warning">
               <div className="flex items-start gap-3">
                 <MdWbSunny size={18} className="text-warning shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-warning uppercase tracking-wide mb-1">Dica da temporada</p>
+                  <p className="text-xs font-semibold text-warning uppercase tracking-wide mb-1">
+                    Dica da temporada
+                  </p>
                   <p className="text-sm text-text-body leading-relaxed">{guide.seasonalTips}</p>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Restaurants */}
@@ -169,15 +169,8 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
               </h3>
               <ul className="space-y-2">
                 {restaurants.map((r) => (
-                  <li key={r.id} className="p-3 rounded-[--radius-md] bg-surface border border-border shadow-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-sm font-medium text-text-heading">{r.name}</span>
-                      <span className="text-xs text-text-muted flex items-center gap-0.5 shrink-0">
-                        <MdLocationOn size={12} />
-                        {r.distance}
-                      </span>
-                    </div>
-                    <p className="text-xs text-text-muted mt-1 leading-relaxed">{r.description}</p>
+                  <li key={r.id}>
+                    <PlaceCard name={r.name} distance={r.distance} description={r.description} />
                   </li>
                 ))}
               </ul>
@@ -193,15 +186,8 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
               </h3>
               <ul className="space-y-2">
                 {attractions.map((a) => (
-                  <li key={a.id} className="p-3 rounded-[--radius-md] bg-surface border border-border shadow-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-sm font-medium text-text-heading">{a.name}</span>
-                      <span className="text-xs text-text-muted flex items-center gap-0.5 shrink-0">
-                        <MdLocationOn size={12} />
-                        {a.distance}
-                      </span>
-                    </div>
-                    <p className="text-xs text-text-muted mt-1 leading-relaxed">{a.description}</p>
+                  <li key={a.id}>
+                    <PlaceCard name={a.name} distance={a.distance} description={a.description} />
                   </li>
                 ))}
               </ul>
@@ -217,18 +203,13 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
               </h3>
               <ul className="space-y-2">
                 {essentials.map((e) => (
-                  <li key={e.id} className="p-3 rounded-[--radius-md] bg-surface border border-border shadow-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <EssentialIcon placeType={e.placeType} />
-                        <span className="text-sm font-medium text-text-heading">{e.name}</span>
-                      </div>
-                      <span className="text-xs text-text-muted flex items-center gap-0.5 shrink-0">
-                        <MdLocationOn size={12} />
-                        {e.distance}
-                      </span>
-                    </div>
-                    <p className="text-xs text-text-muted mt-1 ml-6 leading-relaxed">{e.description}</p>
+                  <li key={e.id}>
+                    <PlaceCard
+                      name={e.name}
+                      distance={e.distance}
+                      description={e.description}
+                      icon={<EssentialIcon placeType={e.placeType} />}
+                    />
                   </li>
                 ))}
               </ul>

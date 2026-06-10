@@ -1,5 +1,8 @@
-import { SectionTitle } from '@/components/shared/molecules/SectionTitle';
+import { MdLogin, MdLogout } from 'react-icons/md';
+import { Card, Divider } from '@/components/shared/atoms';
+import { InfoCard } from '@/components/shared/molecules';import { SectionTitle } from '@/components/shared/molecules/SectionTitle';
 import { RuleItem } from '@/components/property/molecules/RuleItem';
+import type { PolicyKey } from '@/components/property/molecules/RuleItem';
 
 interface StayRulesSectionProps {
   checkInTime: string;
@@ -20,6 +23,14 @@ export function StayRulesSection({
   suitableForBabies,
   eventsPermitted,
 }: StayRulesSectionProps) {
+  const policies: Array<{ policy: PolicyKey; allowed: boolean }> = [
+    { policy: 'pet', allowed: allowPet },
+    { policy: 'smoking', allowed: smokingPermitted },
+    { policy: 'children', allowed: suitableForChildren },
+    { policy: 'babies', allowed: suitableForBabies },
+    { policy: 'events', allowed: eventsPermitted },
+  ];
+
   return (
     <section aria-label="Regras da estadia">
       <SectionTitle
@@ -30,36 +41,32 @@ export function StayRulesSection({
 
       {/* Check-in / Check-out — cartões grandes */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-text-muted mb-2">
-            Check-in
-          </p>
-          <p className="text-lg font-bold text-text-heading leading-tight">
-            A partir das {checkInTime}
-          </p>
-        </div>
-        <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-text-muted mb-2">
-            Check-out
-          </p>
-          <p className="text-lg font-bold text-text-heading leading-tight">
-            Até as {checkOutTime}
-          </p>
-        </div>
+        <InfoCard
+          icon={<MdLogin size={20} />}
+          label="Check-in"
+          value={`A partir das ${checkInTime}`}
+          align="center"
+        />
+        <InfoCard
+          icon={<MdLogout size={20} />}
+          label="Check-out"
+          value={`Até as ${checkOutTime}`}
+          align="center"
+        />
       </div>
 
-      <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm">
+      <Card>
         <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
           Políticas
         </p>
-        <div className="divide-y divide-border">
-          <RuleItem policy="pet" allowed={allowPet} />
-          <RuleItem policy="smoking" allowed={smokingPermitted} />
-          <RuleItem policy="children" allowed={suitableForChildren} />
-          <RuleItem policy="babies" allowed={suitableForBabies} />
-          <RuleItem policy="events" allowed={eventsPermitted} />
+        <div>
+          {policies.map(({ policy, allowed }, index) => (
+            <div key={policy}>
+              {index > 0 && <Divider />}
+              <RuleItem policy={policy} allowed={allowed} />
+            </div>
+          ))}
         </div>
-      </div>
-    </section>
+      </Card>    </section>
   );
 }

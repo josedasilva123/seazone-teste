@@ -1,4 +1,5 @@
 import { MdWhatsapp, MdLocationOn } from 'react-icons/md';
+import { Button, Card, Divider } from '@/components/shared/atoms';
 
 interface HostCardProps {
   name: string;
@@ -29,8 +30,7 @@ export function HostCard({ name, phone, address }: HostCardProps) {
   const whatsappUrl = `https://wa.me/55${phone.replace(/\D/g, '')}`;
 
   return (
-    <div className="bg-surface border border-border rounded-[--radius-lg] shadow-sm overflow-hidden">
-      {/* Cabeçalho do anfitrião */}
+    <Card padding={false} className="overflow-hidden">
       <div className="flex items-center gap-4 p-5 border-b border-border">
         <div className="flex items-center justify-center w-14 h-14 bg-primary-light rounded-full text-primary font-bold text-xl shrink-0">
           {name.charAt(0).toUpperCase()}
@@ -42,35 +42,37 @@ export function HostCard({ name, phone, address }: HostCardProps) {
         </div>
       </div>
 
-      {/* CTA WhatsApp */}
       <div className="px-5 py-4">
-        <a
+        <Button
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1ebe5d] text-white font-semibold text-sm py-3 rounded-[--radius-md] transition-colors"
+          variant="whatsapp"
+          fullWidth
         >
           <MdWhatsapp size={20} />
           Falar com o anfitrião
-        </a>
+        </Button>
       </div>
 
-      {/* Endereço */}
       {address && (
-        <div className="flex items-start gap-2.5 px-5 pb-5 text-sm text-text-muted border-t border-border pt-4">
-          <MdLocationOn size={16} className="mt-0.5 shrink-0 text-text-subtle" />
-          <address className="not-italic leading-relaxed">
-            {address.street}, {address.number}
-            {address.complement ? ` — ${address.complement}` : ''}
-            {' · '}
-            {address.neighborhood}
-            {' · '}
-            {address.city}/{address.state}
-            {' · '}
-            CEP {address.postalCode}
-          </address>
-        </div>
+        <>
+          <Divider />
+          <div className="flex items-start gap-2.5 px-5 pb-5 pt-4 text-sm text-text-muted">
+            <MdLocationOn size={16} className="mt-0.5 shrink-0 text-text-subtle" />
+            <address className="not-italic leading-relaxed">
+              {address.street}, {address.number}
+              {address.complement ? ` — ${address.complement}` : ''}
+              {' · '}
+              {address.neighborhood}
+              {' · '}
+              {address.city}/{address.state}
+              {' · '}
+              CEP {address.postalCode}
+            </address>
+          </div>
+        </>
       )}
-    </div>
+    </Card>
   );
 }

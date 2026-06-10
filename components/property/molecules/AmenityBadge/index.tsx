@@ -1,4 +1,5 @@
 import { AmenityIcon, amenityLabelMap, type AmenityKey } from '@/components/property/atoms/AmenityIcon';
+import { Badge } from '@/components/shared/atoms';
 
 interface AmenityBadgeProps {
   amenity: AmenityKey;
@@ -7,18 +8,16 @@ interface AmenityBadgeProps {
 
 export function AmenityBadge({ amenity, className = '' }: AmenityBadgeProps) {
   return (
-    <div
+    <Badge
+      icon={<AmenityIcon amenity={amenity} size={18} />}
       className={[
-        'inline-flex items-center gap-2 px-3 py-2 rounded-[--radius-md]',
-        'bg-surface border border-border text-text-body',
-        'text-sm font-medium shadow-sm',
+        'rounded-[--radius-md] shadow-sm px-3 py-2 text-sm',
         className,
-      ].join(' ')}
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
-      <span className="text-primary">
-        <AmenityIcon amenity={amenity} size={18} />
-      </span>
       {amenityLabelMap[amenity]}
-    </div>
+    </Badge>
   );
 }

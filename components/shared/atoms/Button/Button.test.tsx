@@ -30,4 +30,9 @@ describe('Button', () => {
     render(<Button fullWidth>Largo</Button>);
     expect(screen.getByRole('button')).toHaveClass('w-full');
   });
+
+  it('renderiza como link quando href é fornecido', () => {
+    render(<Button href="https://example.com">Link</Button>);
+    expect(screen.getByRole('link', { name: 'Link' })).toHaveAttribute('href', 'https://example.com');
+  });
 });
