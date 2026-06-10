@@ -125,9 +125,10 @@ model Host {
 // ─── Local Guide ─────────────────────────────────────────────────────────────
 
 model LocalGuide {
-  id             String @id @default(cuid())
+  id             String    @id @default(cuid())
   welcomeMessage String
-  seasonalTips   String @default("")
+  seasonalTips   String    @default("")
+  aiGeneratedAt  DateTime?
 
   property   Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String           @unique

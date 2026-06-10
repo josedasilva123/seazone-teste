@@ -88,11 +88,6 @@ async function main() {
             alt: 'Quarto principal com cama de casal',
             order: 2,
           },
-          {
-            url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
-            alt: 'Varanda com vista para a cidade',
-            order: 3,
-          },
         ],
       },
 
@@ -222,19 +217,14 @@ async function main() {
             order: 0,
           },
           {
-            url: 'https://images.unsplash.com/photo-1505873242700-f289a29e1724?w=800',
-            alt: 'Sala com lareira e decoração rústica',
-            order: 1,
-          },
-          {
             url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800',
             alt: 'Área de churrasqueira e deck externo',
-            order: 2,
+            order: 1,
           },
           {
             url: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800',
             alt: 'Quarto suíte com vista para o jardim',
-            order: 3,
+            order: 2,
           },
         ],
       },

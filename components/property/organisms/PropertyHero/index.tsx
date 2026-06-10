@@ -1,9 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { MdChevronLeft, MdChevronRight, MdLocationOn } from 'react-icons/md';
-import { Badge } from '@/components/shared/atoms/Badge';
-import { PropertyMeta } from '@/components/property/molecules/PropertyMeta';
+import {
+  MdChevronLeft,
+  MdChevronRight,
+  MdLocationOn,
+  MdBed,
+  MdBathtub,
+  MdPeople,
+} from 'react-icons/md';
 
 interface PropertyImage {
   url: string;
@@ -45,79 +50,106 @@ export function PropertyHero({
   }
 
   return (
-    <div className="w-full">
-      {/* Gallery */}
-      <div className="relative w-full aspect-[16/9] bg-surface-secondary overflow-hidden rounded-[--radius-xl]">
-        {sorted.length > 0 ? (
-          <>
+    <div className="relative w-full aspect-video bg-gray-900 overflow-hidden grid grid-rows-[1fr_auto]">
+
+      {/* Fundo desfocado */}
+      {sorted.length > 0 && (
+        <img
+          src={sorted[currentIndex].url}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
+        />
+      )}
+
+      {/* Overlay escuro */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/25" />
+
+      {/* Badge tipo — canto superior esquerdo */}
+      <div className="absolute top-3 left-4 z-10">
+        <span className="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-primary text-white shadow">
+          {propertyType}
+        </span>
+      </div>
+
+      {/* Contador de fotos — canto superior direito */}
+      {total > 1 && (
+        <span className="absolute top-3 right-4 z-10 text-xs text-white bg-black/50 rounded-full px-2.5 py-1 backdrop-blur-sm">
+          {currentIndex + 1} / {total}
+        </span>
+      )}
+
+      {/* Linha 1 do grid: carrossel (1fr) — min-h-0 impede overflow para a linha inferior */}
+      <div className="relative z-10 min-h-0 flex items-center justify-center px-4 pt-10 pb-2">
+        <div className="relative w-full max-w-[800px] h-full rounded-[--radius-xl] overflow-hidden shadow-2xl ring-1 ring-white/15">
+          {sorted.length > 0 ? (
             <img
               src={sorted[currentIndex].url}
               alt={sorted[currentIndex].alt || name}
               className="w-full h-full object-cover"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white/50 text-sm bg-gray-800">
+              Sem fotos disponíveis
+            </div>
+          )}
 
-            {total > 1 && (
-              <>
-                <button
-                  onClick={prev}
-                  aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer"
-                >
-                  <MdChevronLeft size={22} />
-                </button>
-                <button
-                  onClick={next}
-                  aria-label="Próxima foto"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer"
-                >
-                  <MdChevronRight size={22} />
-                </button>
+          {total > 1 && (
+            <>
+              <button
+                onClick={prev}
+                aria-label="Foto anterior"
+                className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-black/45 text-white hover:bg-black/65 transition-colors cursor-pointer"
+              >
+                <MdChevronLeft size={20} />
+              </button>
+              <button
+                onClick={next}
+                aria-label="Próxima foto"
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-black/45 text-white hover:bg-black/65 transition-colors cursor-pointer"
+              >
+                <MdChevronRight size={20} />
+              </button>
 
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {sorted.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentIndex(i)}
-                      aria-label={`Foto ${i + 1}`}
-                      className={[
-                        'w-1.5 h-1.5 rounded-full transition-all cursor-pointer',
-                        i === currentIndex ? 'bg-white scale-125' : 'bg-white/50',
-                      ].join(' ')}
-                    />
-                  ))}
-                </div>
-
-                <span className="absolute top-3 right-3 text-xs text-white bg-black/50 rounded-full px-2.5 py-1">
-                  {currentIndex + 1} / {total}
-                </span>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-text-subtle text-sm">
-            Sem fotos disponíveis
-          </div>
-        )}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {sorted.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentIndex(i)}
+                    aria-label={`Foto ${i + 1}`}
+                    className={[
+                      'w-1.5 h-1.5 rounded-full transition-all cursor-pointer',
+                      i === currentIndex ? 'bg-white scale-125' : 'bg-white/50',
+                    ].join(' ')}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Property info */}
-      <div className="mt-4 space-y-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="primary" size="sm">
-            {propertyType}
-          </Badge>
+      {/* Linha 2 do grid: informações (auto) — sempre visível, nunca coberta */}
+      <div className="relative z-10 px-5 pt-2 pb-4">
+        <h1 className="text-base font-bold leading-snug text-white drop-shadow">{name}</h1>
+        <div className="flex items-center gap-1.5 text-white/75 text-xs mt-0.5 mb-1">
+          <MdLocationOn size={12} className="shrink-0" />
+          <span>{city}, {state}</span>
         </div>
-
-        <h1 className="text-2xl font-bold text-text-heading leading-tight">{name}</h1>
-
-        <div className="flex items-center gap-1.5 text-text-muted text-sm">
-          <MdLocationOn size={16} className="text-primary shrink-0" />
-          <span>
-            {city}, {state}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0 text-[11px] text-white/65">
+          <span className="flex items-center gap-1">
+            <MdBed size={12} />
+            {bedrooms} quarto{bedrooms !== 1 ? 's' : ''}
+          </span>
+          <span className="flex items-center gap-1">
+            <MdBathtub size={12} />
+            {bathrooms} banheiro{bathrooms !== 1 ? 's' : ''}
+          </span>
+          <span className="flex items-center gap-1">
+            <MdPeople size={12} />
+            até {maxGuests} hóspede{maxGuests !== 1 ? 's' : ''}
           </span>
         </div>
-
-        <PropertyMeta bedrooms={bedrooms} bathrooms={bathrooms} maxGuests={maxGuests} />
       </div>
     </div>
   );

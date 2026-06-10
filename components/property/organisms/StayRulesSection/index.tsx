@@ -1,6 +1,4 @@
-import { MdLogin, MdLogout } from 'react-icons/md';
 import { SectionTitle } from '@/components/shared/molecules/SectionTitle';
-import { InfoCard } from '@/components/shared/molecules/InfoCard';
 import { RuleItem } from '@/components/property/molecules/RuleItem';
 
 interface StayRulesSectionProps {
@@ -30,19 +28,24 @@ export function StayRulesSection({
         className="mb-4"
       />
 
+      {/* Check-in / Check-out — cartões grandes */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <InfoCard
-          icon={<MdLogin size={20} />}
-          label="Check-in"
-          value={`A partir das ${checkInTime}`}
-          variant="highlight"
-        />
-        <InfoCard
-          icon={<MdLogout size={20} />}
-          label="Check-out"
-          value={`Até as ${checkOutTime}`}
-          variant="highlight"
-        />
+        <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-text-muted mb-2">
+            Check-in
+          </p>
+          <p className="text-lg font-bold text-text-heading leading-tight">
+            A partir das {checkInTime}
+          </p>
+        </div>
+        <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-text-muted mb-2">
+            Check-out
+          </p>
+          <p className="text-lg font-bold text-text-heading leading-tight">
+            Até as {checkOutTime}
+          </p>
+        </div>
       </div>
 
       <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm">
