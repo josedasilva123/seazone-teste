@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: "file:./prisma/dev.db"
+      # Todos os testes mockam @/lib/db — nenhuma conexão real é feita.
+      # DATABASE_URL precisa existir para o prisma generate (via postinstall).
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
       OPENAI_API_KEY: "sk-test-placeholder"
 
     steps:
@@ -24,14 +26,8 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Instalar dependências
+      - name: Instalar dependências (inclui prisma generate via postinstall)
         run: npm ci
-
-      - name: Gerar Prisma Client
-        run: npx prisma generate
-
-      - name: Aplicar migrações (SQLite)
-        run: npx prisma migrate deploy
 
       - name: Executar testes
         run: npm run test:run
