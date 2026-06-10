@@ -163,6 +163,28 @@ describe('ChatAssistant', () => {
     expect(screen.getByText('Posso trazer meu cachorro?')).toBeInTheDocument();
   });
 
+  it('renderiza markdown nas respostas do assistente', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      createMockResponse(
+        '* **Capivari (Aprox. 500 metros):** O centro da cidade.\n* **Baden Baden (Aprox. 600 metros):** Cervejaria artesanal.',
+      ),
+    );
+
+    render(<ChatAssistant code="GRM001" />);
+    await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+
+    const input = screen.getByPlaceholderText(/Digite sua pergunta/i);
+    await userEvent.type(input, 'O que tem perto?');
+    await userEvent.click(screen.getByRole('button', { name: /Enviar mensagem/i }));
+
+    await waitFor(() => {
+      const bold = screen.getByText(/Capivari \(Aprox\. 500 metros\):/);
+      expect(bold.tagName).toBe('STRONG');
+    });
+
+    expect(screen.queryByText(/\*\*Capivari/)).not.toBeInTheDocument();
+  });
+
   it('exibe sugestões novamente quando ocorre erro de rede', async () => {
     vi.mocked(fetch).mockRejectedValue(new Error('Network error'));
 

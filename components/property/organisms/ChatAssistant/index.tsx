@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MdChat, MdClose, MdSend, MdSmartToy } from 'react-icons/md';
 import { Button } from '@/components/shared/atoms';
+import { MarkdownContent } from '@/components/shared/molecules';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -198,9 +199,15 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                         : 'bg-surface-secondary text-text-body rounded-bl-sm border border-border',
                     ].join(' ')}
                   >
-                    {msg.content || (msg.role === 'assistant' && isStreaming && i === messages.length - 1 ? (
+                    {msg.content ? (
+                      msg.role === 'assistant' ? (
+                        <MarkdownContent content={msg.content} />
+                      ) : (
+                        msg.content
+                      )
+                    ) : msg.role === 'assistant' && isStreaming && i === messages.length - 1 ? (
                       <TypingIndicator />
-                    ) : null)}
+                    ) : null}
                   </div>
                 </div>
               ))}
