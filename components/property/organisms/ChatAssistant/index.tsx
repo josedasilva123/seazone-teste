@@ -156,10 +156,11 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
   return (
     <>
       <Button
+        variant="secondary"
         onClick={() => setIsOpen(true)}
         aria-label="Abrir assistente virtual"
         className={[
-          'fixed bottom-6 right-6 z-50 rounded-full shadow-lg',
+          'fixed bottom-6 right-6 z-50 shadow-lg',
           isOpen ? 'hidden' : 'inline-flex',
         ].join(' ')}
       >
@@ -239,11 +240,11 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                   {SUGGESTED_QUESTIONS.map((q) => (
                     <Button
                       key={q}
-                      variant="secondary"
+                      variant="ghost"
                       size="sm"
                       onClick={() => sendMessage(q)}
                       disabled={isStreaming}
-                      className="justify-start text-left font-normal"
+                      className="justify-start text-left font-normal rounded-[--radius-md] border border-primary/30 text-primary hover:bg-primary-light"
                     >
                       {q}
                     </Button>

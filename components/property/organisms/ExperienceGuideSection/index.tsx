@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MdRestaurant, MdAttractions, MdLocalPharmacy, MdShoppingCart, MdLocalHospital, MdAutoAwesome, MdWbSunny } from 'react-icons/md';
-import { Card } from '@/components/shared/atoms';
+import { MdExplore, MdRestaurant, MdAttractions, MdLocalPharmacy, MdShoppingCart, MdLocalHospital, MdAutoAwesome, MdWbSunny } from 'react-icons/md';
+import { Badge, Card } from '@/components/shared/atoms';
 import { SectionTitle } from '@/components/shared/molecules';
 import { PlaceCard } from '@/components/property/molecules/PlaceCard';
 
@@ -124,8 +124,10 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
   return (
     <section>
       <SectionTitle
+        icon={<MdExplore size={22} aria-hidden />}
         title="Guia de Experiências"
         subtitle="Descubra o melhor da região ao redor do seu imóvel"
+        className="mb-4"
       />
 
       {loading && !generating && <GuideSkeleton />}
@@ -163,10 +165,9 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
           {/* Restaurants */}
           {restaurants.length > 0 && (
             <div>
-              <h3 className="flex items-center gap-2 text-sm font-semibold text-text-heading mb-3">
-                <MdRestaurant size={16} className="text-primary" />
+              <Badge variant="tag" icon={<MdRestaurant size={16} />} className="mb-3">
                 Restaurantes próximos
-              </h3>
+              </Badge>
               <ul className="space-y-2">
                 {restaurants.map((r) => (
                   <li key={r.id}>
@@ -180,10 +181,9 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
           {/* Attractions */}
           {attractions.length > 0 && (
             <div>
-              <h3 className="flex items-center gap-2 text-sm font-semibold text-text-heading mb-3">
-                <MdAttractions size={16} className="text-primary" />
+              <Badge variant="tag" icon={<MdAttractions size={16} />} className="mb-3">
                 Atrações próximas
-              </h3>
+              </Badge>
               <ul className="space-y-2">
                 {attractions.map((a) => (
                   <li key={a.id}>
@@ -197,10 +197,9 @@ export function ExperienceGuideSection({ code }: ExperienceGuideSectionProps) {
           {/* Essentials */}
           {essentials.length > 0 && (
             <div>
-              <h3 className="flex items-center gap-2 text-sm font-semibold text-text-heading mb-3">
-                <MdLocalPharmacy size={16} className="text-primary" />
+              <Badge variant="tag" icon={<MdLocalPharmacy size={16} />} className="mb-3">
                 Serviços essenciais
-              </h3>
+              </Badge>
               <ul className="space-y-2">
                 {essentials.map((e) => (
                   <li key={e.id}>

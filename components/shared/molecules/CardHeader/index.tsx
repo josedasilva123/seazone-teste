@@ -1,37 +1,26 @@
 import type { ReactNode } from 'react';
-
-type IconTone = 'primary' | 'accent' | 'neutral';
+import { Badge } from '@/components/shared/atoms';
 
 interface CardHeaderProps {
   icon: ReactNode;
   title: string;
-  iconTone?: IconTone;
+  /** @deprecated Mantido por compatibilidade; tags usam ícone coral. */
+  iconTone?: 'primary' | 'accent' | 'neutral';
   className?: string;
 }
-
-const iconToneClasses: Record<IconTone, string> = {
-  primary: 'bg-primary-light text-primary',
-  accent: 'bg-accent-light text-accent',
-  neutral: 'bg-surface-secondary text-text-muted',
-};
 
 export function CardHeader({
   icon,
   title,
-  iconTone = 'primary',
   className = '',
 }: CardHeaderProps) {
   return (
-    <div className={['flex items-center gap-2 mb-3', className].filter(Boolean).join(' ')}>
-      <div
-        className={[
-          'flex items-center justify-center w-9 h-9 rounded-[--radius-md]',
-          iconToneClasses[iconTone],
-        ].join(' ')}
-      >
-        {icon}
-      </div>
-      <span className="text-sm font-semibold text-text-heading">{title}</span>
-    </div>
+    <Badge
+      variant="tag"
+      icon={icon}
+      className={['mb-3', className].filter(Boolean).join(' ')}
+    >
+      {title}
+    </Badge>
   );
 }

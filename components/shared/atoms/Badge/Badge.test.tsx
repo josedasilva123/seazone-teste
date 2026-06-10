@@ -22,4 +22,17 @@ describe('Badge', () => {
     expect(screen.getByTestId('icon')).toBeInTheDocument();
     expect(screen.getByText('Favorito')).toBeInTheDocument();
   });
+
+  it('aplica variante tag com estilo pill e ícone coral', () => {
+    render(
+      <Badge variant="tag" icon={<span data-testid="icon">★</span>}>
+        Sobre a Reserva
+      </Badge>,
+    );
+    const tag = screen.getByText('Sobre a Reserva');
+    expect(tag).toHaveClass('bg-surface');
+    expect(tag).toHaveClass('rounded-full');
+    expect(tag).toHaveClass('border-border');
+    expect(screen.getByTestId('icon').parentElement).toHaveClass('text-primary-action');
+  });
 });

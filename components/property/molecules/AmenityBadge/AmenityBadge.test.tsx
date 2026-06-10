@@ -16,4 +16,10 @@ describe('AmenityBadge', () => {
     const { container } = render(<AmenityBadge amenity="airConditioning" />);
     expect(container.querySelector('svg')).toBeInTheDocument();
   });
+
+  it('usa estilo tag pill com fundo branco', () => {
+    render(<AmenityBadge amenity="wifi" />);
+    expect(screen.getByText('WiFi')).toHaveClass('rounded-full');
+    expect(screen.getByText('WiFi')).toHaveClass('bg-surface');
+  });
 });

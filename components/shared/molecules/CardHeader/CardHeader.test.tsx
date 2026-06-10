@@ -10,10 +10,10 @@ describe('CardHeader', () => {
     expect(screen.getByTestId('icon')).toBeInTheDocument();
   });
 
-  it('aplica tom accent no ícone', () => {
-    const { container } = render(
-      <CardHeader icon={<span>★</span>} title="Acesso" iconTone="accent" />,
-    );
-    expect(container.querySelector('.bg-accent-light')).toBeInTheDocument();
+  it('renderiza como tag pill com ícone coral', () => {
+    render(<CardHeader icon={<span data-testid="tag-icon">★</span>} title="WiFi" />);
+    expect(screen.getByText('WiFi')).toHaveClass('rounded-full');
+    expect(screen.getByText('WiFi')).toHaveClass('bg-surface');
+    expect(screen.getByTestId('tag-icon').parentElement).toHaveClass('text-primary-action');
   });
 });

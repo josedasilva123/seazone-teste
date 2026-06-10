@@ -1,3 +1,4 @@
+import { MdLocationOn } from 'react-icons/md';
 import { SectionTitle } from '@/components/shared/molecules/SectionTitle';
 import { HostCard } from '@/components/property/molecules/HostCard';
 
@@ -21,6 +22,7 @@ export function HostSection({ host, address }: HostSectionProps) {
   return (
     <section aria-label="Contato e localização">
       <SectionTitle
+        icon={<MdLocationOn size={22} aria-hidden />}
         title="Contato & Localização"
         subtitle="Precisa de ajuda? Fale com seu anfitrião."
         className="mb-4"

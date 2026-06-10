@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-type Variant = 'default' | 'primary' | 'success' | 'danger' | 'warning' | 'accent';
+type Variant = 'default' | 'primary' | 'success' | 'danger' | 'warning' | 'accent' | 'tag';
 type Size = 'sm' | 'md';
 
 interface BadgeProps {
@@ -18,6 +18,7 @@ const variantClasses: Record<Variant, string> = {
   danger: 'bg-danger-light text-danger border border-danger/20',
   warning: 'bg-warning-light text-warning border border-warning/20',
   accent: 'bg-accent-light text-accent border border-accent/20',
+  tag: 'bg-surface text-text-heading border border-border font-medium',
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -43,7 +44,18 @@ export function Badge({
         .filter(Boolean)
         .join(' ')}
     >
-      {icon && <span className="shrink-0">{icon}</span>}
+      {icon && (
+        <span
+          className={[
+            'shrink-0',
+            variant === 'tag' ? 'text-primary-action' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {icon}
+        </span>
+      )}
       {children}
     </span>
   );
