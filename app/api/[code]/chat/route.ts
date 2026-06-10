@@ -16,7 +16,12 @@ const RESPONSE_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
 };
 
-function streamFallback(text: string): ReadableStream {
+const FALLBACK_HEADERS = {
+  ...RESPONSE_HEADERS,
+  'X-Is-Fallback': 'true',
+};
+
+function streamText(text: string): ReadableStream {
   const encoder = new TextEncoder();
   const words = text.split(/(?<=\s)/);
   return new ReadableStream({
@@ -57,40 +62,37 @@ export async function POST(
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
   const systemPrompt = GuideService.buildChatContext(property, guide);
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder();
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      stream: true,
+      temperature: 0.3,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+    });
 
-      try {
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          stream: true,
-          temperature: 0.3,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages,
-          ],
-        });
-
-        for await (const chunk of completion) {
-          const text = chunk.choices[0]?.delta?.content ?? '';
-          if (text) controller.enqueue(encoder.encode(text));
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of completion) {
+            const text = chunk.choices[0]?.delta?.content ?? '';
+            if (text) controller.enqueue(encoder.encode(text));
+          }
+        } finally {
+          controller.close();
         }
-      } catch (err) {
-        const fallbackText = ChatFallbackService.isQuotaError(err)
-          ? ChatFallbackService.respond(lastUserMessage, property, guide)
-          : 'Desculpe, o assistente está temporariamente indisponível. Por favor, tente novamente em alguns instantes.';
+      },
+    });
 
-        const words = fallbackText.split(/(?<=\s)/);
-        for (const word of words) {
-          controller.enqueue(encoder.encode(word));
-          await new Promise((r) => setTimeout(r, 20));
-        }
-      } finally {
-        controller.close();
-      }
-    },
-  });
+    return new Response(stream, { headers: RESPONSE_HEADERS });
+  } catch (err) {
+    const fallbackText = ChatFallbackService.isQuotaError(err)
+      ? ChatFallbackService.respond(lastUserMessage, property, guide)
+      : 'Desculpe, o assistente está temporariamente indisponível. Por favor, tente novamente em alguns instantes.';
 
-  return new Response(stream, { headers: RESPONSE_HEADERS });
+    return new Response(streamText(fallbackText), { headers: FALLBACK_HEADERS });
+  }
 }

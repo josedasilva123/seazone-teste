@@ -34,6 +34,7 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -71,6 +72,7 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
     setMessages(newMessages);
     setInput('');
     setIsStreaming(true);
+    setShowSuggestions(false);
 
     const assistantMessage: Message = { role: 'assistant', content: '' };
     setMessages([...newMessages, assistantMessage]);
@@ -89,6 +91,8 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
         throw new Error('Erro na resposta do servidor');
       }
 
+      const isFallback = response.headers.get('X-Is-Fallback') === 'true';
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
@@ -105,6 +109,8 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
           ];
         });
       }
+
+      if (isFallback) setShowSuggestions(true);
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
       setMessages((prev) => {
@@ -115,6 +121,7 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
           { ...last, content: last.content || 'Desculpe, ocorreu um erro. Tente novamente.' },
         ];
       });
+      setShowSuggestions(true);
     } finally {
       setIsStreaming(false);
     }
@@ -197,7 +204,7 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                 </div>
               ))}
 
-              {messages.length <= 1 && (
+              {(messages.length <= 1 || showSuggestions) && (
                 <div className="flex flex-col gap-2 pt-1">
                   <p className="text-xs text-text-muted text-center">Perguntas sugeridas:</p>
                   {SUGGESTED_QUESTIONS.map((q) => (
