@@ -4,10 +4,12 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { MdChat, MdClose, MdSend, MdSmartToy } from 'react-icons/md';
 import { Button } from '@/components/shared/atoms';
 import { MarkdownContent } from '@/components/shared/molecules/MarkdownContent';
+import { TypewriterMarkdown } from '@/components/shared/molecules/TypewriterMarkdown';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  animate?: boolean;
 }
 
 interface ChatAssistantProps {
@@ -76,7 +78,7 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
     setIsStreaming(true);
     setShowSuggestions(false);
 
-    const assistantMessage: Message = { role: 'assistant', content: '' };
+    const assistantMessage: Message = { role: 'assistant', content: '', animate: true };
     setMessages([...newMessages, assistantMessage]);
 
     abortRef.current = new AbortController();
@@ -213,7 +215,14 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                   >
                     {msg.content ? (
                       msg.role === 'assistant' ? (
-                        <MarkdownContent content={msg.content} />
+                        msg.animate && i === messages.length - 1 ? (
+                          <TypewriterMarkdown
+                            content={msg.content}
+                            isStreaming={isStreaming}
+                          />
+                        ) : (
+                          <MarkdownContent content={msg.content} />
+                        )
                       ) : (
                         msg.content
                       )
