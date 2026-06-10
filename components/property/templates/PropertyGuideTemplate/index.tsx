@@ -1,4 +1,3 @@
-import { MdLogin, MdLogout } from 'react-icons/md';
 import { AppHeader } from '@/components/shared/organisms/AppHeader';
 import { PropertyHero } from '@/components/property/organisms/PropertyHero';
 import { AmenitiesSection } from '@/components/property/organisms/AmenitiesSection';
@@ -7,6 +6,7 @@ import { StayRulesSection } from '@/components/property/organisms/StayRulesSecti
 import { HostSection } from '@/components/property/organisms/HostSection';
 import { ExperienceGuideSection } from '@/components/property/organisms/ExperienceGuideSection';
 import { ChatAssistant } from '@/components/property/organisms/ChatAssistant';
+import { CheckInOutStrip } from '@/components/property/molecules/CheckInOutStrip';
 import type { AmenityKey } from '@/components/property/atoms/AmenityIcon';
 
 type AccessType = 'smart_lock' | 'key_safe' | 'physical_key' | 'other';
@@ -80,36 +80,10 @@ export function PropertyGuideTemplate({
         images={images}
       />
 
-      <div className="w-full bg-primary text-white">
-        <div className="max-w-2xl mx-auto px-4 py-4 grid grid-cols-2 divide-x divide-white/20">
-          <div className="flex items-center gap-3 pr-4">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 shrink-0">
-              <MdLogin size={18} />
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
-                Check-in
-              </p>
-              <p className="text-sm font-bold leading-tight">
-                A partir das {rules.checkInTime}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 pl-4">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 shrink-0">
-              <MdLogout size={18} />
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
-                Check-out
-              </p>
-              <p className="text-sm font-bold leading-tight">
-                Até as {rules.checkOutTime}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CheckInOutStrip
+        checkInTime={rules.checkInTime}
+        checkOutTime={rules.checkOutTime}
+      />
 
       <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-8 space-y-10">
         <AmenitiesSection amenities={amenities} />

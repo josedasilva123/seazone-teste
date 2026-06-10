@@ -27,20 +27,15 @@ describe('PropertyHero', () => {
     expect(screen.getByText('Florianópolis, SC')).toBeInTheDocument();
   });
 
-  it('renderiza badge com tipo do imóvel', () => {
+  it('renderiza metadados do imóvel', () => {
     render(<PropertyHero {...baseProps} />);
-    expect(screen.getByText('Apartamento')).toBeInTheDocument();
-  });
-
-  it('exibe contador de fotos quando há mais de uma imagem', () => {
-    render(<PropertyHero {...baseProps} />);
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    expect(screen.getByText(/2 quartos/)).toBeInTheDocument();
   });
 
   it('navega para próxima foto ao clicar em avançar', async () => {
     render(<PropertyHero {...baseProps} />);
     await userEvent.click(screen.getByRole('button', { name: 'Próxima foto' }));
-    expect(screen.getByText('2 / 2')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Foto 2' })).toHaveClass('scale-125');
   });
 
   it('exibe mensagem quando não há fotos', () => {

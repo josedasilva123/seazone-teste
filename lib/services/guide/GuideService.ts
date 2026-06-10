@@ -1,9 +1,7 @@
-import OpenAI from 'openai';
+import { generateJsonContent } from '@/lib/ai';
 import { GuideRepository } from '@/lib/repositories/guide';
 import type { GuideWithPlaces } from '@/lib/repositories/guide';
 import { PropertyRepository } from '@/lib/repositories/property';
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const GUIDE_SYSTEM_PROMPT = `Você é um especialista em turismo e gastronomia brasileiro. 
 Gere um guia local preciso e contextualizado para hóspedes de uma propriedade de temporada.
@@ -74,17 +72,7 @@ export const GuideService = {
 
     let generated: RawGuide;
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: GUIDE_SYSTEM_PROMPT },
-          { role: 'user', content: prompt },
-        ],
-        response_format: { type: 'json_object' },
-        temperature: 0.7,
-      });
-
-      const raw = completion.choices[0]?.message?.content ?? '{}';
+      const raw = await generateJsonContent(GUIDE_SYSTEM_PROMPT, prompt);
       generated = JSON.parse(raw) as RawGuide;
     } catch (aiError) {
       if (guide && guide.places.length > 0) {

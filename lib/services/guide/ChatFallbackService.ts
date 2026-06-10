@@ -1,3 +1,4 @@
+import { isGeminiQuotaError } from '@/lib/ai';
 import type { PropertyRepository } from '@/lib/repositories/property';
 import type { GuideRepository } from '@/lib/repositories/guide';
 
@@ -158,8 +159,6 @@ export const ChatFallbackService = {
   },
 
   isQuotaError(err: unknown): boolean {
-    if (!(err instanceof Error)) return false;
-    const msg = err.message.toLowerCase();
-    return msg.includes('429') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('insufficient_quota');
+    return isGeminiQuotaError(err);
   },
 };

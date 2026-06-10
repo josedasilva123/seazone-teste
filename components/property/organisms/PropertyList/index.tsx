@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { listProperties } from '@/lib/actions/property';
 import type { PropertyListItem } from '@/lib/repositories/property';
+import { Button } from '@/components/shared/atoms';
 import { PropertyCard } from '@/components/property/molecules/PropertyCard';
 import { PropertyCardSkeletonGrid } from '@/components/property/atoms/PropertyCardSkeleton';
 
@@ -110,12 +111,9 @@ export function PropertyList({
       {error && (
         <div className="mt-6 text-center">
           <p className="text-sm text-danger mb-3">{error}</p>
-          <button
-            onClick={loadMore}
-            className="text-sm text-primary hover:underline cursor-pointer"
-          >
+          <Button variant="ghost" size="sm" onClick={loadMore}>
             Tentar novamente
-          </button>
+          </Button>
         </div>
       )}
 

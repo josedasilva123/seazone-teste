@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Card } from '@/components/shared/atoms/Card';
 
 interface InfoCardProps {
   icon: ReactNode;
@@ -6,6 +7,7 @@ interface InfoCardProps {
   value: string;
   subvalue?: string;
   variant?: 'default' | 'highlight';
+  align?: 'left' | 'center';
   className?: string;
 }
 
@@ -15,17 +17,18 @@ export function InfoCard({
   value,
   subvalue,
   variant = 'default',
+  align = 'left',
   className = '',
 }: InfoCardProps) {
   const isHighlight = variant === 'highlight';
+  const isCenter = align === 'center';
 
   return (
-    <div
+    <Card
+      variant={isHighlight ? 'highlight' : 'default'}
       className={[
-        'flex flex-col gap-2 p-4 rounded-[--radius-lg] border',
-        isHighlight
-          ? 'bg-primary-light border-primary/20'
-          : 'bg-surface border-border shadow-sm',
+        'flex flex-col gap-2',
+        isCenter ? 'items-center text-center' : '',
         className,
       ]
         .filter(Boolean)
@@ -45,7 +48,8 @@ export function InfoCard({
         </p>
         <p
           className={[
-            'font-semibold text-base leading-tight',
+            'font-semibold leading-tight',
+            isCenter ? 'text-lg' : 'text-base',
             isHighlight ? 'text-primary' : 'text-text-heading',
           ].join(' ')}
         >
@@ -55,6 +59,6 @@ export function InfoCard({
           <p className="text-sm text-text-muted mt-0.5">{subvalue}</p>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

@@ -1,0 +1,41 @@
+---
+description: Co-author obrigatório em commits solicitados pelo usuário
+alwaysApply: true
+---
+
+# Commits — Co-author Cursor
+
+Sempre que o usuário pedir para commitar (criar commit, commitar alterações, etc.), inclua o Cursor como co-author no corpo da mensagem.
+
+## Formato obrigatório
+
+Adicione como última linha do corpo do commit:
+
+```
+Co-authored-by: Cursor <cursoragent@cursor.com>
+```
+
+## Exemplo (PowerShell / múltiplos `-m`)
+
+```bash
+git commit -m "feat: adiciona filtro por cidade" -m "Descrição opcional do porquê." -m "Co-authored-by: Cursor <cursoragent@cursor.com>"
+```
+
+## Exemplo (HEREDOC em bash)
+
+```bash
+git commit -m "$(cat <<'EOF'
+feat: adiciona filtro por cidade
+
+Descrição opcional do porquê.
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+EOF
+)"
+```
+
+## Demais convenções
+
+- Seguir o protocolo de segurança git do projeto (nunca alterar git config, nunca force push em main, etc.).
+- Não commitar arquivos com secrets (`.env`, credenciais).
+- Só commitar quando o usuário pedir explicitamente.

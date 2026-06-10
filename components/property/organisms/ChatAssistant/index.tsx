@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MdChat, MdClose, MdSend, MdSmartToy } from 'react-icons/md';
+import { Button } from '@/components/shared/atoms';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -139,19 +140,17 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
 
   return (
     <>
-      <button
+      <Button
         onClick={() => setIsOpen(true)}
         aria-label="Abrir assistente virtual"
         className={[
-          'fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg',
-          'bg-primary text-white font-semibold text-sm',
-          'hover:bg-primary-hover transition-all duration-200 cursor-pointer',
-          isOpen ? 'hidden' : 'flex',
+          'fixed bottom-6 right-6 z-50 rounded-full shadow-lg',
+          isOpen ? 'hidden' : 'inline-flex',
         ].join(' ')}
       >
         <MdChat size={20} />
         <span>Assistente</span>
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-end sm:justify-end sm:p-6">
@@ -174,13 +173,15 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                   <p className="text-[10px] text-white/70 leading-tight">Seazone · {code}</p>
                 </div>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleClose}
                 aria-label="Fechar chat"
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/15 transition-colors cursor-pointer"
+                className="w-8 h-8 p-0 rounded-full text-white hover:bg-white/15 hover:text-white"
               >
                 <MdClose size={18} />
-              </button>
+              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
@@ -208,14 +209,16 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                 <div className="flex flex-col gap-2 pt-1">
                   <p className="text-xs text-text-muted text-center">Perguntas sugeridas:</p>
                   {SUGGESTED_QUESTIONS.map((q) => (
-                    <button
+                    <Button
                       key={q}
+                      variant="secondary"
+                      size="sm"
                       onClick={() => sendMessage(q)}
                       disabled={isStreaming}
-                      className="text-left text-xs px-3 py-2 rounded-[--radius-md] border border-border bg-surface hover:bg-primary-light hover:border-primary/30 transition-colors text-text-body cursor-pointer disabled:opacity-50"
+                      className="justify-start text-left font-normal"
                     >
                       {q}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -236,14 +239,15 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                 disabled={isStreaming}
                 className="flex-1 text-sm px-3 py-2 rounded-[--radius-md] border border-border bg-surface-secondary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 disabled:opacity-60 text-text-body placeholder:text-text-muted"
               />
-              <button
+              <Button
                 type="submit"
+                size="sm"
                 disabled={!input.trim() || isStreaming}
                 aria-label="Enviar mensagem"
-                className="w-9 h-9 flex items-center justify-center rounded-[--radius-md] bg-primary text-white hover:bg-primary-hover transition-colors disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed shrink-0"
+                className="w-9 h-9 p-0 shrink-0"
               >
                 <MdSend size={16} />
-              </button>
+              </Button>
             </form>
           </div>
         </div>

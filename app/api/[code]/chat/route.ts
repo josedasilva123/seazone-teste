@@ -1,9 +1,7 @@
-import OpenAI from 'openai';
 import { GuideRepository } from '@/lib/repositories/guide';
 import { PropertyRepository } from '@/lib/repositories/property';
+import { iterateStreamText, streamChatContent } from '@/lib/ai';
 import { GuideService, ChatFallbackService } from '@/lib/services/guide';
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -63,23 +61,14 @@ export async function POST(
   const systemPrompt = GuideService.buildChatContext(property, guide);
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      stream: true,
-      temperature: 0.3,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages,
-      ],
-    });
+    const completion = await streamChatContent(systemPrompt, messages);
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of completion) {
-            const text = chunk.choices[0]?.delta?.content ?? '';
-            if (text) controller.enqueue(encoder.encode(text));
+          for await (const text of iterateStreamText(completion.stream)) {
+            controller.enqueue(encoder.encode(text));
           }
         } finally {
           controller.close();

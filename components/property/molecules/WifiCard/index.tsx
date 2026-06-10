@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { MdWifi, MdContentCopy, MdCheck } from 'react-icons/md';
+import { Button, Card } from '@/components/shared/atoms';
+import { CardHeader, DataField } from '@/components/shared/molecules';
 
 interface WifiCardProps {
   network: string;
@@ -18,30 +20,23 @@ export function WifiCard({ network, password }: WifiCardProps) {
   }
 
   return (
-    <div className="bg-surface border border-border rounded-[--radius-lg] p-4 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex items-center justify-center w-9 h-9 bg-primary-light rounded-[--radius-md] text-primary">
-          <MdWifi size={20} />
-        </div>
-        <span className="text-sm font-semibold text-text-heading">WiFi</span>
-      </div>
+    <Card>
+      <CardHeader icon={<MdWifi size={20} />} title="WiFi" />
 
       <div className="space-y-2">
-        <div>
-          <p className="text-xs text-text-muted mb-0.5">Rede</p>
-          <p className="text-sm font-medium text-text-body">{network}</p>
-        </div>
-
-        <div>
-          <p className="text-xs text-text-muted mb-0.5">Senha</p>
-          <div className="flex items-center justify-between gap-2 bg-surface-secondary rounded-[--radius-md] px-3 py-2">
-            <span className="text-sm font-mono font-medium text-text-heading tracking-wide">
-              {password}
-            </span>
-            <button
+        <DataField label="Rede" value={network} />
+        <DataField
+          label="Senha"
+          value={password}
+          mono
+          boxed
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleCopy}
-              className="flex items-center gap-1 text-xs text-primary hover:text-primary-hover transition-colors cursor-pointer"
               aria-label="Copiar senha"
+              className="text-primary hover:text-primary-hover px-0 py-0 h-auto min-h-0"
             >
               {copied ? (
                 <>
@@ -54,10 +49,10 @@ export function WifiCard({ network, password }: WifiCardProps) {
                   <span>Copiar</span>
                 </>
               )}
-            </button>
-          </div>
-        </div>
+            </Button>
+          }
+        />
       </div>
-    </div>
+    </Card>
   );
 }

@@ -65,18 +65,22 @@ components/
 │   └── organisms/
 │       ├── AppHeader/
 │       └── index.ts
-└── property/                 # Exclusivo do domínio de imóveis
+└── property/                 # Exclusivo do domínio de imóveis — ver property/README.md
     ├── atoms/
     │   ├── AmenityIcon/
     │   ├── RuleStatus/
+    │   ├── PropertyCardSkeleton/
     │   └── index.ts
     ├── molecules/
     │   ├── PropertyMeta/
+    │   ├── PropertyCard/
     │   ├── AmenityBadge/
     │   ├── WifiCard/
     │   ├── AccessCard/
     │   ├── RuleItem/
     │   ├── HostCard/
+    │   ├── CheckInOutStrip/
+    │   ├── PlaceCard/
     │   └── index.ts
     ├── organisms/
     │   ├── PropertyHero/
@@ -84,6 +88,9 @@ components/
     │   ├── AccessSection/
     │   ├── StayRulesSection/
     │   ├── HostSection/
+    │   ├── PropertyList/
+    │   ├── ExperienceGuideSection/
+    │   ├── ChatAssistant/
     │   └── index.ts
     └── templates/
         ├── PropertyGuideTemplate/
@@ -199,7 +206,11 @@ import { AppHeader } from '@/components/shared/organisms';
 
 ---
 
-### `property/atoms` — Átomos do domínio
+### `property/` — Domínio de imóveis
+
+Documentação completa com todas as funcionalidades, props, integrações e observações: **[property/README.md](./property/README.md)**.
+
+#### Átomos do domínio
 
 #### `AmenityIcon`
 
@@ -227,7 +238,7 @@ import { RuleStatus } from '@/components/property/atoms';
 
 ---
 
-### `property/molecules` — Moléculas do domínio
+#### Moléculas do domínio
 
 #### `PropertyMeta`
 
@@ -316,7 +327,7 @@ import { HostCard } from '@/components/property/molecules';
 
 ---
 
-### `property/organisms` — Seções completas
+#### Organismos — Seções completas
 
 | Organismo | Props principais |
 |---|---|
@@ -325,10 +336,13 @@ import { HostCard } from '@/components/property/molecules';
 | `AccessSection` | `wifi`, `access`, `parking?` |
 | `StayRulesSection` | `checkInTime`, `checkOutTime`, `allowPet`, `smokingPermitted`, `suitableForChildren`, `suitableForBabies`, `eventsPermitted` |
 | `HostSection` | `host: { name, phone }`, `address?` |
+| `PropertyList` | `initialItems`, `initialPage`, `initialTotalPages`, `initialTotal` |
+| `ExperienceGuideSection` | `code` |
+| `ChatAssistant` | `code` |
 
 ---
 
-### `property/templates`
+#### Templates
 
 #### `PropertyGuideTemplate`
 

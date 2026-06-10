@@ -28,4 +28,11 @@ describe('InfoCard', () => {
     );
     expect(container.firstChild).toHaveClass('bg-primary-light');
   });
+
+  it('centraliza conteúdo quando align=center', () => {
+    const { container } = render(
+      <InfoCard icon={<span>★</span>} label="Check-in" value="15h" align="center" />
+    );
+    expect(container.firstChild).toHaveClass('items-center');
+  });
 });
