@@ -132,6 +132,24 @@ describe('ChatFallbackService.respond', () => {
     const answer = ChatFallbackService.respond('Qual a temperatura do sol?', mockProperty, mockGuide);
     expect(answer).toContain('anfitrião');
   });
+
+  it('responde cordialmente a boa noite', () => {
+    const answer = ChatFallbackService.respond('boa noite', mockProperty, mockGuide);
+    expect(answer).toContain('Boa noite');
+    expect(answer).toContain('Apartamento Florianópolis');
+    expect(answer).not.toContain('Não tenho informações suficientes');
+  });
+
+  it('responde cordialmente a olá', () => {
+    const answer = ChatFallbackService.respond('Olá!', mockProperty, mockGuide);
+    expect(answer).toContain('Olá');
+    expect(answer).toContain('WiFi');
+  });
+
+  it('responde a agradecimentos', () => {
+    const answer = ChatFallbackService.respond('Obrigado pela ajuda', mockProperty, mockGuide);
+    expect(answer).toContain('Por nada');
+  });
 });
 
 describe('ChatFallbackService.isQuotaError', () => {

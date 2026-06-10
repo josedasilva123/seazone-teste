@@ -7,10 +7,43 @@ type Guide = Awaited<ReturnType<typeof GuideRepository.findByPropertyCode>>;
 
 interface Rule {
   keywords: string[];
-  respond: (property: Property, guide: Guide) => string;
+  respond: (property: Property, guide: Guide, message?: string) => string;
 }
 
+function normalizeText(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function buildGreetingReply(message: string, propertyName: string): string {
+  const lower = normalizeText(message);
+  const intro = (greeting: string) =>
+    `${greeting}! Sou o assistente do imóvel **${propertyName}**. ` +
+    'É um prazer ajudar durante sua estadia. Posso informar sobre **WiFi**, **check-in/check-out**, ' +
+    'regras da casa e **dicas da região**. O que você gostaria de saber?';
+
+  if (lower.includes('boa noite')) return intro('Boa noite');
+  if (lower.includes('bom dia')) return intro('Bom dia');
+  if (lower.includes('boa tarde')) return intro('Boa tarde');
+  if (lower.includes('obrigad') || lower.includes('valeu') || lower.includes('agradec'))
+    return 'Por nada! Estou à disposição se precisar de mais alguma informação sobre o imóvel.';
+  if (lower.includes('tchau') || lower.includes('ate logo') || lower.includes('até logo'))
+    return 'Até logo! Tenha uma ótima estadia. Se precisar de algo, é só chamar.';
+
+  return intro('Olá');
+}
+
+const GREETING_KEYWORDS = [
+  'oi', 'ola', 'olá', 'hey', 'hello', 'hi', 'e ai', 'e aí', 'eai',
+  'bom dia', 'boa tarde', 'boa noite', 'tudo bem', 'td bem',
+  'obrigado', 'obrigada', 'valeu', 'agradeco', 'agradeço',
+  'tchau', 'ate logo', 'até logo', 'flw', 'falou',
+];
+
 const RULES: Rule[] = [
+  {
+    keywords: GREETING_KEYWORDS,
+    respond: (p, _g, message) => buildGreetingReply(message ?? '', p.name),
+  },
   {
     keywords: ['wifi', 'wi-fi', 'wi fi', 'senha', 'internet', 'rede', 'password', 'network'],
     respond: (p) => {
@@ -146,12 +179,11 @@ const FALLBACK_DEFAULT =
 
 export const ChatFallbackService = {
   respond(lastUserMessage: string, property: Property, guide: Guide): string {
-    const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const lower = normalize(lastUserMessage);
+    const lower = normalizeText(lastUserMessage);
 
     for (const rule of RULES) {
-      if (rule.keywords.some((kw) => lower.includes(normalize(kw)))) {
-        return rule.respond(property, guide);
+      if (rule.keywords.some((kw) => lower.includes(normalizeText(kw)))) {
+        return rule.respond(property, guide, lastUserMessage);
       }
     }
 
