@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { createDefaultMetadata } from "@/lib/utils/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,11 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: 'Guia Digital do Hóspede | Seazone',
-  description:
-    'Acesse todas as informações do seu imóvel: WiFi, regras, check-in, amenidades e contato do anfitrião.',
-};
+export const metadata = createDefaultMetadata();
 
 export default function RootLayout({
   children,

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 import { getPropertyByCode } from '@/lib/actions/property';
+import { createPropertyMetadata } from '@/lib/utils/metadata';
 import { PropertyGuideTemplate } from '@/components/property/templates';
 import { getAccessType } from '@/components/property/molecules/AccessCard';
 import type { AmenityKey } from '@/components/property/atoms/AmenityIcon';
@@ -23,7 +23,7 @@ interface PageProps {
   params: Promise<{ code: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps) {
   const { code } = await params;
   const result = await getPropertyByCode(code.toUpperCase());
 
@@ -31,13 +31,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Imóvel não encontrado — Seazone' };
   }
 
-  const { name, address } = result.data;
-  const location = address ? `${address.city}, ${address.state}` : '';
+  const { name, address, images } = result.data;
+  const coverImage = [...images].sort((a, b) => a.order - b.order)[0];
 
-  return {
-    title: `${name}${location ? ` — ${location}` : ''} | Guia do Hóspede Seazone`,
-    description: `Guia digital do hóspede para ${name}. Acesse WiFi, informações de check-in, regras e contato do anfitrião.`,
-  };
+  return createPropertyMetadata({
+    code,
+    name,
+    city: address?.city,
+    state: address?.state,
+    coverImageUrl: coverImage?.url,
+    coverImageAlt: coverImage?.alt,
+  });
 }
 
 export default async function PropertyGuidePage({ params }: PageProps) {

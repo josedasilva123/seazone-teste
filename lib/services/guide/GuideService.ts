@@ -124,6 +124,7 @@ export const GuideService = {
 
     return `Você é um assistente virtual do imóvel "${property.name}" da Seazone.
 Responda sempre em português, de forma cordial e objetiva.
+Use Markdown para formatar respostas quando útil (listas com *, **negrito** para destaques, quebras de linha).
 Responda APENAS com informações presentes neste contexto — não invente dados.
 Se uma pergunta não puder ser respondida com o contexto fornecido, diga que não tem essa informação e sugira contato com o anfitrião.
 
