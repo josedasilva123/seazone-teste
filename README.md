@@ -182,3 +182,80 @@ Os testes unitários ficam junto ao componente/serviço (`*.test.tsx` / `*.test.
 npm run test:run     # Execução única
 npm run coverage     # Com relatório de cobertura
 ```
+
+## Decisões Técnicas
+
+### Ponto de partida
+
+O projeto foi estruturado a partir de regras explícitas por frente de implementação, registradas em arquivos `.mdc` dentro de `.cursor/rules/` (back-end, testes, design system, atomic design). Essas regras funcionam como contrato arquitetural para desenvolvimento assistido por IA: reduzem ambiguidade, padronizam convenções e evitam que cada sessão de implementação reinvente a estrutura do projeto.
+
+Complementam esse contrato o README principal e READMEs internos (por exemplo, em `components/`), que documentam componentes, fluxos e APIs para humanos e para agentes de IA.
+
+### Next.js 16 (App Router)
+
+O framework concentra roteamento, renderização no servidor e integração com React 19 em um único runtime. As páginas (`app/`) buscam dados via Server Actions e renderizam templates com Server Components sempre que possível; componentes `'use client'` ficam restritos a interatividade (chat, paginação, formulários). Essa divisão reduz JavaScript enviado ao navegador e mantém a lógica de dados próxima ao servidor.
+
+### Server Actions e Route Handlers
+
+A maior parte da camada de back-end usa **Server Actions** — listagem de imóveis, busca por código, mutações futuras. A motivação é simplicidade: sem camada HTTP explícita para operações request/response convencionais, o Next.js serializa a chamada diretamente do componente ou da page.
+
+Duas funcionalidades de IA usam **Route Handlers** (`app/api/[code]/guide` e `app/api/[code]/chat`):
+
+- **Guia local** — geração sob demanda com resposta JSON.
+- **Chat assistente** — streaming de texto via `ReadableStream`, incompatível com o modelo de retorno das Server Actions.
+
+Em ambos os casos, os handlers são finos: delegam para a mesma camada de **Services** usada pelas Actions. Se no futuro for necessário expor uma Action como REST, basta reutilizar o Service — a lógica de negócio não muda.
+
+Cada Action fica em um arquivo isolado (`lib/actions/[domain]/`) para facilitar essa migração pontual.
+
+### Camadas de back-end
+
+O fluxo obrigatório é:
+
+```
+page.tsx / route.ts → Action ou Handler → Service → Repository → Prisma → PostgreSQL
+```
+
+| Camada | Responsabilidade |
+|---|---|
+| **Action / Handler** | Entrada pública, validação Zod, formato de resposta (`ActionResult<T>` ou HTTP) |
+| **Service** | Regras de negócio; não conhece Prisma |
+| **Repository** | Única camada que acessa `db`; encapsula queries |
+
+Essa separação isola a persistência: trocar ORM ou banco exige alterar apenas os repositories, não a lógica de negócio.
+
+Entradas são validadas com **Zod** antes de chegar ao Service. Server Actions retornam sempre `ActionResult<T>` (`{ ok: true, data }` ou `{ ok: false, error }`), evitando expor exceções não tratadas ao cliente.
+
+### Prisma ORM
+
+O Prisma concentra modelagem declarativa (`schema.prisma`), geração de client tipado e migrações versionadas (`prisma migrate`). Na versão 7, o client exige um **driver adapter** — o projeto usa `@prisma/adapter-pg` com PostgreSQL em produção.
+
+Consultas complexas podem recorrer a `$queryRaw` quando o query builder não for suficiente. O acesso ao banco, porém, permanece confinado aos repositories; Services e Actions nunca importam `db` diretamente.
+
+### Atomic Design + domínios
+
+A UI segue **Atomic Design** (atoms → molecules → organisms → templates) organizada por **domínio funcional** (`property/`, futuros `booking/`, etc.).
+
+O diretório `shared/` reúne componentes reutilizáveis entre domínios; cada domínio mantém seus próprios átomos e moléculas. Regra de dependência: componentes de um domínio não importam de outro — apenas de `shared/`. Essa combinação de Atomic Design com fronteiras por domínio facilita localizar código e escalar o projeto sem acoplamento cruzado.
+
+### Design System
+
+A implementação começou pelos componentes genéricos (`Button`, `Badge`, `InfoCard`…) com tokens semânticos definidos em `globals.css` (`text-primary`, `bg-surface`, `border-border`, etc.) e consumidos via Tailwind CSS 4.
+
+Documentar o catálogo cedo (READMEs + regra `.mdc`) faz com que implementações seguintes se concentrem em lógica e composição, não em estilos ad hoc. Esse padrão acelera iterações porque novas telas reutilizam peças já testadas e visualmente consistentes.
+
+### Google Gemini
+
+O **Gemini 2.5 Flash** foi escolhido por equilibrar latência, qualidade de resposta e cota gratuita — permitindo demonstrar IA funcionando de fato no ambiente de teste, sem custo inicial.
+
+A integração prevê degradação graciosa:
+
+- **Guia local** — conteúdo persistido no banco; geração assíncrona na primeira requisição.
+- **Chat** — streaming via API; se a cota esgotar, `ChatFallbackService` responde com regras baseadas nos dados do imóvel (WiFi, pets, check-in, etc.).
+- **Chave ausente** — resposta 503 com mensagem clara, sem quebrar a página.
+
+A lógica de IA fica isolada em `lib/ai/`; Services orquestram quando chamar o modelo e quando usar fallback.
+
+### Testes
+
+**Vitest 4** + **React Testing Library** + **jsdom**. Testes unitários ficam colocados junto ao código (`Component.test.tsx`, `Service.test.ts`); testes de integração de fluxo completo ficam em `tests/integration/`. A regra é cobrir renderização, estados (loading, erro, vazio), callbacks e camadas de back-end com mocks de `db` e serviços externos — garantindo regressão rápida sem depender de banco ou API real.
