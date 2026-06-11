@@ -63,6 +63,25 @@ describe('ChatAssistant', () => {
     expect(screen.getByText('Que restaurantes tem perto?')).toBeInTheDocument();
   });
 
+  it('permite interagir com elementos da página enquanto o chat está aberto', async () => {
+    const onPageClick = vi.fn();
+
+    render(
+      <>
+        <button type="button" onClick={onPageClick}>
+          Conteúdo da página
+        </button>
+        <ChatAssistant code="FLN001" />
+      </>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+    expect(screen.getByText('Assistente Virtual', { exact: true })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Conteúdo da página' }));
+    expect(onPageClick).toHaveBeenCalledOnce();
+  });
+
   it('fecha o painel ao clicar no botão de fechar', async () => {
     render(<ChatAssistant code="FLN001" />);
     await userEvent.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));

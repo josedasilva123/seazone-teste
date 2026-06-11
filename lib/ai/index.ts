@@ -1,9 +1,12 @@
 export {
+  CHAT_INTERNAL_REMINDER,
   CHAT_MAX_ASSISTANT_HISTORY_LENGTH,
   CHAT_MAX_HISTORY_MESSAGES,
   CHAT_WELCOME_MESSAGE,
   INJECTION_REFUSAL_MESSAGE,
+  detectContextLeak,
   detectPromptInjection,
+  hasInjectionInMessages,
   isSeedWelcomeMessage,
   prepareChatMessagesForLlm,
   sanitizeMessageContent,

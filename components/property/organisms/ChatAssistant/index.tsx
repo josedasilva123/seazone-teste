@@ -171,14 +171,9 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
       </Button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-end sm:justify-end sm:p-6">
+        <div className="fixed inset-x-0 bottom-0 z-50 flex justify-end sm:inset-auto sm:bottom-6 sm:right-6 pointer-events-none">
           <div
-            className="absolute inset-0 bg-black/40 sm:hidden"
-            onClick={handleClose}
-            aria-hidden
-          />
-
-          <div className="relative z-10 w-full sm:w-96 flex flex-col bg-surface rounded-t-[--radius-xl] sm:rounded-[--radius-xl] shadow-lg border border-border overflow-hidden"
+            className="pointer-events-auto w-full sm:w-96 flex flex-col bg-surface rounded-t-[--radius-xl] sm:rounded-[--radius-xl] shadow-lg border border-border overflow-hidden"
             style={{ height: 'min(560px, 85dvh)' }}
           >
             <div className="flex items-center justify-between px-4 py-3 bg-primary text-white shrink-0">

@@ -32,6 +32,22 @@ describe('Fluxo do assistente virtual no guia do imóvel', () => {
     vi.unstubAllGlobals();
   });
 
+  it('mantém o guia interativo com o chat aberto', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+    render(<PropertyGuideTemplate {...propertyGuideTemplateProps} />);
+    await user.click(screen.getByRole('button', { name: /Abrir assistente virtual/i }));
+
+    expect(screen.getByText('Assistente Virtual', { exact: true })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Copiar senha' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Copiado')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Assistente Virtual', { exact: true })).toBeInTheDocument();
+  });
+
   it('abre o chat a partir do guia e exibe a mensagem de boas-vindas', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
