@@ -2,7 +2,8 @@ import { GuideRepository } from '@/lib/repositories/guide';
 import { PropertyRepository } from '@/lib/repositories/property';
 import {
   GeminiConfigError,
-  detectPromptInjection,
+  detectContextLeak,
+  hasInjectionInMessages,
   INJECTION_REFUSAL_MESSAGE,
   isGeminiConfigured,
   isGeminiQuotaError,
@@ -76,7 +77,7 @@ export async function POST(
 
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
 
-  if (detectPromptInjection(lastUserMessage)) {
+  if (hasInjectionInMessages(messages)) {
     return new Response(streamText(INJECTION_REFUSAL_MESSAGE), { headers: RESPONSE_HEADERS });
   }
 
@@ -94,8 +95,21 @@ export async function POST(
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
+        let accumulated = '';
+        let blocked = false;
+
         try {
           for await (const text of iterateStreamText(completion.stream)) {
+            if (blocked) continue;
+
+            accumulated += text;
+            if (detectContextLeak(accumulated)) {
+              blocked = true;
+              controller.enqueue(encoder.encode(INJECTION_REFUSAL_MESSAGE));
+              controller.close();
+              return;
+            }
+
             controller.enqueue(encoder.encode(text));
           }
           controller.close();
