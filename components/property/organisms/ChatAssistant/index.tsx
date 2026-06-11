@@ -5,6 +5,8 @@ import { MdChat, MdClose, MdSend, MdSmartToy } from 'react-icons/md';
 import { Button } from '@/components/shared/atoms';
 import { MarkdownContent } from '@/components/shared/molecules/MarkdownContent';
 import { TypewriterMarkdown } from '@/components/shared/molecules/TypewriterMarkdown';
+import { CHAT_WELCOME_MESSAGE } from '@/lib/ai';
+import { CHAT_MAX_MESSAGE_LENGTH } from '@/lib/validations/chat';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -56,7 +58,7 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
       setMessages([
         {
           role: 'assistant',
-          content: 'Olá! Sou o assistente virtual deste imóvel. Como posso ajudar?',
+          content: CHAT_WELCOME_MESSAGE,
         },
       ]);
     }
@@ -263,7 +265,8 @@ export function ChatAssistant({ code }: ChatAssistantProps) {
                 ref={inputRef}
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => setInput(e.target.value.slice(0, CHAT_MAX_MESSAGE_LENGTH))}
+                maxLength={CHAT_MAX_MESSAGE_LENGTH}
                 placeholder="Digite sua pergunta..."
                 disabled={isStreaming}
                 className="flex-1 text-sm px-3 py-2 rounded-[--radius-md] border border-border bg-surface-secondary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 disabled:opacity-60 text-text-body placeholder:text-text-muted"

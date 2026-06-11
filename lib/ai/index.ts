@@ -1,4 +1,14 @@
 export {
+  CHAT_MAX_ASSISTANT_HISTORY_LENGTH,
+  CHAT_MAX_HISTORY_MESSAGES,
+  CHAT_WELCOME_MESSAGE,
+  INJECTION_REFUSAL_MESSAGE,
+  detectPromptInjection,
+  isSeedWelcomeMessage,
+  prepareChatMessagesForLlm,
+  sanitizeMessageContent,
+} from './chatSafety';
+export {
   DEFAULT_GEMINI_MODEL,
   GeminiConfigError,
   extractGeminiErrorMessage,
