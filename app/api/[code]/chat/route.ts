@@ -3,7 +3,7 @@ import { PropertyRepository } from '@/lib/repositories/property';
 import {
   GeminiConfigError,
   detectContextLeak,
-  hasInjectionInMessages,
+  detectPromptInjection,
   INJECTION_REFUSAL_MESSAGE,
   isGeminiConfigured,
   isGeminiQuotaError,
@@ -77,7 +77,7 @@ export async function POST(
 
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
 
-  if (hasInjectionInMessages(messages)) {
+  if (detectPromptInjection(lastUserMessage)) {
     return new Response(streamText(INJECTION_REFUSAL_MESSAGE), { headers: RESPONSE_HEADERS });
   }
 

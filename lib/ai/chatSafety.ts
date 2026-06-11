@@ -114,6 +114,7 @@ export function prepareChatMessagesForLlm(
 ): GeminiChatMessage[] {
   const withoutWelcome = messages.filter((message, index) => {
     if (index === 0 && isSeedWelcomeMessage(message)) return false;
+    if (message.role === 'user' && detectPromptInjection(message.content)) return false;
     return true;
   });
 
